@@ -34,4 +34,10 @@ def getsession(reset=False):
     _session = webuntis.Session(server=_server, school=_school,
                                 useragent=_useragent,
                                 username=_user, password=_password)
+    try:
+        _session.login()
+    except webuntis.errors.BadCredentialsError as err:
+        print(str(err), file=sys.stderr)
+        print('To correct credentials, call getsession with reset=True')
+        return
     return _session
