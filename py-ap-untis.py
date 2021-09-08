@@ -15,7 +15,7 @@ _user = None
 _password = None
 _session = None
 
-def getsession(reset=False):
+def get_session(reset=False):
     global _session
     
     for v in ('server', 'school', 'user', 'password'):
@@ -38,6 +38,6 @@ def getsession(reset=False):
         _session.login()
     except webuntis.errors.BadCredentialsError as err:
         print(str(err), file=sys.stderr)
-        print('To correct credentials, call getsession with reset=True')
+        print('To correct credentials, call get_session with reset=True')
         return
     return _session
