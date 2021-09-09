@@ -18,6 +18,7 @@ _session = None
 _subjects = None
 _rooms = None
 _schoolyears = None
+_teachers = None
 
 def get_session(reset=False):
     global _session
@@ -49,17 +50,23 @@ def get_session(reset=False):
 def _assert_session():
     assert _session, 'You need to get_session first'
 
-def get_subjects():
+def get_subjects(reset=False):
     global _subjects
+    if not reset and _subjects is not None:
+        return _subjects
     _assert_session()
     _subjects = _session.subjects()
 
-def get_rooms():
+def get_rooms(reset=False):
     global _rooms
+    if not reset and _rooms is not None:
+        return _rooms
     _assert_session()
     _rooms = _session.rooms()
 
-def get_schoolyears():
+def get_schoolyears(reset=False):
     global _schoolyears
+    if not reset and _schoolyears is not None:
+        return _schoolyears
     _assert_session()
     _schoolyears = _session.schoolyears()
