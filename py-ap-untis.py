@@ -55,7 +55,7 @@ def get_subjects(reset=False):
     if not reset and _subjects is not None:
         return _subjects
     _assert_session()
-    _subjects = _session.subjects()
+    _subjects = {s.id: s for s in _session.subjects()}
     return _subjects
 
 def get_rooms(reset=False):
@@ -63,7 +63,7 @@ def get_rooms(reset=False):
     if not reset and _rooms is not None:
         return _rooms
     _assert_session()
-    _rooms = _session.rooms()
+    _rooms = {r.id: r for r in _session.rooms()}
     return _rooms
 
 def get_schoolyears(reset=False):
@@ -71,7 +71,7 @@ def get_schoolyears(reset=False):
     if not reset and _schoolyears is not None:
         return _schoolyears
     _assert_session()
-    _schoolyears = _session.schoolyears()
+    _schoolyears = {s.id: s for s in _session.schoolyears()}
     return _schoolyears
 
 def get_teachers(reset=False):
