@@ -63,7 +63,10 @@ def get_department(name):
     global _departments
     if _departments is None:
         get_departments()
-    return next(d for d in _departments.values() if d.name == name)
+    try:
+        return next(d for d in _departments.values() if d.name == name)
+    except StopIteration:
+        return None
 
 def get_subjects(reset=False):
     global _subjects
