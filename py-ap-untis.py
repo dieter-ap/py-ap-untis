@@ -20,6 +20,7 @@ _subjects = None
 _rooms = None
 _schoolyears = None
 _teachers = None
+_groups = None
 
 def get_session(reset=False):
     global _session
@@ -123,3 +124,16 @@ def search_teacher(surname, forename, try_reversed=True):
     if t:
         _teachers[t.id] = t
         return t
+
+def get_groups(department=None, reset=False):
+    global _groups
+    if reset or _groups is None:
+        _assert_session()
+        _groups = {k.id: k for k in _session.klassen()}
+
+    if department is not None:
+        return {
+            k: v for k, v in _groups.items() if v._data.get('did', -1) in
+                (department, getattr(get_department(department), 'id', None))
+            }
+    return _groups
