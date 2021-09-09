@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import csv
+import datetime
 from fnmatch import fnmatch
 from getpass import getpass
 import sys
@@ -146,3 +148,16 @@ def get_groups(department=None, reset=False):
 def find_groups(pattern='', department=None):
     groups = get_groups(department).values()
     return [g for g in groups if fnmatch(g.name, pattern)]
+
+def write_timetable_csv(outfile, tt_data):
+    writer = csv.writer(outfile)
+    for el in tt_data:
+        teachers = [t['id'] for t in el._data['te']]
+        teachers = [get_teachers().get(t, t) for t in teachers]
+        teachers = [getattr(t, 'full_name', '? (%s)' % t) for t in teachers]
+        writer.writerow([el.start.date(), el.start.time(), el.end.time(),
+                         '|'.join(s.long_name for s in el.subjects),
+                         '|'.join(r.name for r in el.rooms),
+                         '|'.join(g.name for g in el.klassen),
+                         '|'.join(teachers),
+                         ])
