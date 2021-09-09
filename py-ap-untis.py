@@ -15,6 +15,7 @@ _user = None
 _password = None
 _session = None
 
+_departments = None
 _subjects = None
 _rooms = None
 _schoolyears = None
@@ -49,6 +50,20 @@ def get_session(reset=False):
 
 def _assert_session():
     assert _session, 'You need to get_session first'
+
+def get_departments(reset=False):
+    global _departments
+    if not reset and _departments is not None:
+        return _departments
+    _assert_session()
+    _departments = {s.id: s for s in _session.departments()}
+    return _departments
+
+def get_department(name):
+    global _departments
+    if _departments is None:
+        get_departments()
+    return next(d for d in _departments.values() if d.name == name)
 
 def get_subjects(reset=False):
     global _subjects
