@@ -15,6 +15,10 @@ _user = None
 _password = None
 _session = None
 
+_subjects = None
+_rooms = None
+_schoolyears = None
+
 def get_session(reset=False):
     global _session
     
@@ -41,3 +45,21 @@ def get_session(reset=False):
         print('To correct credentials, call get_session with reset=True')
         return
     return _session
+
+def _assert_session():
+    assert _session, 'You need to get_session first'
+
+def get_subjects():
+    global _subjects
+    _assert_session()
+    _subjects = _session.subjects()
+
+def get_rooms():
+    global _rooms
+    _assert_session()
+    _rooms = _session.rooms()
+
+def get_schoolyears():
+    global _schoolyears
+    _assert_session()
+    _schoolyears = _session.schoolyears()
