@@ -56,6 +56,7 @@ def get_subjects(reset=False):
         return _subjects
     _assert_session()
     _subjects = _session.subjects()
+    return _subjects
 
 def get_rooms(reset=False):
     global _rooms
@@ -63,6 +64,7 @@ def get_rooms(reset=False):
         return _rooms
     _assert_session()
     _rooms = _session.rooms()
+    return _rooms
 
 def get_schoolyears(reset=False):
     global _schoolyears
@@ -70,3 +72,4 @@ def get_schoolyears(reset=False):
         return _schoolyears
     _assert_session()
     _schoolyears = _session.schoolyears()
+    return _schoolyears
