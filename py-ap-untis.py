@@ -73,3 +73,35 @@ def get_schoolyears(reset=False):
     _assert_session()
     _schoolyears = _session.schoolyears()
     return _schoolyears
+
+def get_teachers(reset=False):
+    global _teachers
+    if not reset and _teachers is not None:
+        return _teachers
+    _assert_session()
+    try:
+        _teachers = _session.teachers()
+    except webuntis.errors.RemoteError as err:
+        _teachers = {}
+        print(err, file=sys.stderr)
+        print('You can cache teachers manually using search_teacher',
+              file=sys.stderr)
+    return _teachers
+
+def search_teacher(surname, forename, try_reversed=True):
+    global _teachers
+    if _teachers is None:
+        _teachers = {}
+    _assert_session()
+    try:
+        t = _session.get_teacher(surname=surname, fore_name=forename)
+    except KeyError:
+        if try_reversed:
+            try:
+                t = search_teacher(surname=forename, forename=surname,
+                                   try_reversed=False)
+            except KeyError:
+                t = None
+    if t:
+        _teachers[t.id] = t
+        return t
