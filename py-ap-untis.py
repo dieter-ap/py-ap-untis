@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from fnmatch import fnmatch
 from getpass import getpass
 import sys
 
@@ -77,6 +78,10 @@ def get_subjects(reset=False):
     _subjects = {s.id: s for s in _session.subjects()}
     return _subjects
 
+def find_subjects(pattern='', active=True):
+    subjects = get_subjects().values()
+    return [s for s in subjects if fnmatch(s.long_name, pattern)]
+
 def get_rooms(reset=False):
     global _rooms
     if not reset and _rooms is not None:
@@ -137,3 +142,7 @@ def get_groups(department=None, reset=False):
                 (department, getattr(get_department(department), 'id', None))
             }
     return _groups
+
+def find_groups(pattern='', department=None):
+    groups = get_groups(department).values()
+    return [g for g in groups if fnmatch(g.name, pattern)]
