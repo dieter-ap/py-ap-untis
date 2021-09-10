@@ -5,7 +5,7 @@ import sys
 
 from py_ap_untis import *
 
-get_session()
+s = get_session()
 
 # No rights to fetch all teachers, only to query by name.
 search_teacher('Willemen', 'Vaya (Vanessa)')
@@ -18,10 +18,10 @@ search_teacher('Patrick', 'De Meersman')
 # which one is actively used.
 subjects = find_subjects('datacom & netwerken')
 
-# see `help(_session.timetable)`
-tt = get_session().timetable(start=datetime.date(2021, 9, 20),
-                        end=datetime.date(2021, 12, 21),
-                        subject=subjects[0])
+# see `help(s.timetable)`
+tt = s.timetable(start=datetime.date(2021, 9, 20),
+                end=datetime.date(2021, 12, 21),
+                subject=subjects[0])
 
 write_timetable_csv(sys.stdout, tt)
 
