@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Untapped</title>
+    </head>
+    <body>
+        <table id="timetable" class="timetable"></table>
+    </body>
+    <script>
+        var tt = document.getElementById('timetable');
+        for (let hour = 8; hour < 22; hour++) {
+            let tr = document.createElement('tr');
+            tr.id = 'tm_' + hour.toString();
+            tt.appendChild(tr);
+            for (let day = 0; day < 6; day++) {
+                let td = document.createElement('td');
+                td.id = 'tt_d' + day.toString() + '_tm' + hour.toString();
+                if (day == 0) {
+                    td.innerText = hour.toString() + 'u';
+                }
+                tr.appendChild(td);
+            }
+        }
+    </script>
+</html>
