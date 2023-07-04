@@ -16,26 +16,29 @@
         <table id="timetable" class="timetable"></table>
     </body>
     <script>
-        var tt = document.getElementById('timetable');
-        let tr = document.createElement('tr');
-        tt.appendChild(tr);
-        ['', 'Maandag', 'Dinsdag', 'Woesndag', 'Donderdag', 'Vrijdag'].forEach(function(val, idx, arr) {
-            let th = document.createElement('th');
-            th.innerText = val;
-            tr.appendChild(th);
-        })
-        for (let hour = 8; hour < 22; hour++) {
+        function createTimetable() { 
+            var tt = document.getElementById('timetable');
             let tr = document.createElement('tr');
-            tr.id = 'tm_' + hour.toString();
             tt.appendChild(tr);
-            for (let day = 0; day < 6; day++) {
-                let td = document.createElement('td');
-                td.id = 'tt_d' + day.toString() + '_tm' + hour.toString();
-                if (day == 0) {
-                    td.innerText = hour.toString() + 'u';
+            ['', 'Maandag', 'Dinsdag', 'Woesndag', 'Donderdag', 'Vrijdag'].forEach(function(val, idx, arr) {
+                let th = document.createElement('th');
+                th.innerText = val;
+                tr.appendChild(th);
+            })
+            for (let hour = 8; hour < 22; hour++) {
+                let tr = document.createElement('tr');
+                tr.id = 'tm_' + hour.toString();
+                tt.appendChild(tr);
+                for (let day = 0; day < 6; day++) {
+                    let td = document.createElement('td');
+                    td.id = 'tt_d' + day.toString() + '_tm' + hour.toString();
+                    if (day == 0) {
+                        td.innerText = hour.toString() + 'u';
+                    }
+                    tr.appendChild(td);
                 }
-                tr.appendChild(td);
             }
         }
+        createTimetable();
     </script>
 </html>
