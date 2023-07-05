@@ -119,6 +119,7 @@ def search_teacher(surname, forename, try_reversed=True):
     if _teachers is None:
         _teachers = {}
     _assert_session()
+    t = None
     try:
         t = _session.get_teacher(surname=surname, fore_name=forename)
     except KeyError:
@@ -127,7 +128,7 @@ def search_teacher(surname, forename, try_reversed=True):
                 t = search_teacher(surname=forename, forename=surname,
                                    try_reversed=False)
             except KeyError:
-                t = None
+                pass
     if t:
         _teachers[t.id] = t
         return t
