@@ -7,10 +7,14 @@ except ImportError:
 
 import py_ap_untis
 
-def getTTable():
+def getTeacherTable(teacher, tbldate):
+    '''
+    Return the timetable for the given teacher (numeric id) and the tbldate
+    which needs to be in isoformat.
+    '''
     s = py_ap_untis.get_session()
-    day1 = datetime.date(2023, 9, 18)
-    tt = s.timetable(start=day1, end=(day1 + datetime.timedelta(days=4)), teacher=3817)
+    day1 = datetime.date.fromisoformat(tbldate)
+    tt = s.timetable(start=day1, end=(day1 + datetime.timedelta(days=4)), teacher=teacher)
     for e in tt:
         day = (e.start.date() - day1).days + 1
         e._data['day'] = day
@@ -18,5 +22,5 @@ def getTTable():
 
 
 ui = webview.create_window('Untapped', url='./untapped.html')
-ui.expose(getTTable)
+ui.expose(getTeacherTable)
 webview.start(debug=True)

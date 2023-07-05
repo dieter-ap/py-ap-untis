@@ -61,8 +61,17 @@
             x = tt; // for debug
             tt.forEach(addTtEl);
         }
+
+        function on_tt_button() {
+            let ttdate = document.getElementById('ttdate').value;
+            let ttteacher = document.getElementById('ttteacher').value;
+            pywebview.api.getTeacherTable(ttteacher, ttdate).then(loadTimetable);
+        }
     </script>
+
     <div>
-        <button onclick="pywebview.api.getTTable().then(loadTimetable)">Load Timetable</button>
+        <input id="ttdate" type="date" value="2023-09-18" />
+        <input id="ttteacher" type="text" value="3817">
+        <button onclick="on_tt_button()">Load Timetable</button>
     </div>
 </html>
