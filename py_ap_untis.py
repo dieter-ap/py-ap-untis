@@ -13,7 +13,7 @@ except ModuleNotFoundError:
 
 _server = 'arche.webuntis.com'
 _school = 'ap-hogeschool-antwerpen'
-_useragent = 'py-ap-untis'
+_useragent = 'py-ap-untis [dieter.roelants@ap.be]'
 _user = None
 _password = None
 _session = None
