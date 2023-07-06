@@ -7,6 +7,9 @@ except ImportError:
 
 import py_ap_untis
 
+def untisLogin(username, passwd):
+    return True
+
 def getTeacherTable(teacher, tbldate):
     '''
     Return the timetable for the given teacher (numeric id) and the tbldate
@@ -22,5 +25,5 @@ def getTeacherTable(teacher, tbldate):
 
 
 ui = webview.create_window('Untapped', url='./untapped.html')
-ui.expose(getTeacherTable)
+ui.expose(untisLogin, getTeacherTable)
 webview.start(debug=True)

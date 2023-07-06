@@ -16,8 +16,22 @@
         </style>
     </head>
     <body>
+        <div id="loginshizzle">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="untisuser" name="username">
+            </div>
+            <div>
+                <label for="pass">Password:</label>
+                <input type="password" id="untispass" name="password">
+            </div>
+            <div>
+                <button onclick="untislogin()">Webuntis login</button>
+                <span id="loginmessage"></span>
+            </div>
+        </div> <!-- #loginshizzle -->
         <div>
-        <table id="timetable" class="timetable"></table>
+            <table id="timetable" class="timetable"></table>
         </div>
         <div>
             <input id="ttdate" type="date" value="2023-09-18" />
@@ -25,6 +39,23 @@
             <button onclick="on_tt_button()">Load Timetable</button>
         </div>
         <script>
+            function untislogin() {
+                let user = document.getElementById('untisuser').value;
+                let pass = document.getElementById('untispass').value;
+                pywebview.api.untisLogin(user, pass).then(
+                    function(success) {
+                        if (success) {
+                            document.getElementById('loginshizzle').hidden = true;
+                            document.getElementById('loginmessage').innerText = '';
+                        } else {
+                            document.getElementById('loginmessage').innerText = 'Login failed';
+                        }
+                    },
+                    function(error) {
+                        document.getElementById('loginmessage').innerText = error;
+                    }
+                )
+            }
             function createTimetable() { 
                 var tt = document.getElementById('timetable');
                 let tr = document.createElement('tr');
