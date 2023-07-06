@@ -14,6 +14,8 @@ def untisLogin(username, passwd):
     py_ap_untis._user = username
     py_ap_untis._password = passwd
     untis_session = py_ap_untis.get_session()
+    if untis_session:
+        untis_session.config['login_repeat'] = 1
     return bool(untis_session)
 
 def _data4schoolyear(schoolyear):
