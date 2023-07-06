@@ -89,7 +89,7 @@
                 let cell = document.getElementById(cell_id);
                 let content = document.createElement('span')
                 let el_class = 'te_' + val.te[0].id; // XXX need to have this per timetable type
-                content.class = el_class;
+                content.className = el_class;
                 content.innerText = '🟢';
                 content.title = 'L: ' + val.te[0].id + ', O: ' + val.su[0].id + ', G: ' + val.kl[0].id;
                 cell.appendChild(content);
