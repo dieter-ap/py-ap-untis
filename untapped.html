@@ -31,10 +31,13 @@
             </div>
         </div> <!-- #loginshizzle -->
         <div>
+            <select name="schoolyears" id="schoolyears" onchange="setTtLimits()"></select>
+        </div>
+        <div>
             <table id="timetable" class="timetable"></table>
         </div>
         <div>
-            <input id="ttdate" type="date" value="2023-09-18" />
+            <input id="ttdate" type="date">
             <input id="ttteacher" type="text" value="3817">
             <button id="ttloadbtn" disabled="true" onclick="on_tt_button()">Load Timetable</button>
         </div>
@@ -47,6 +50,7 @@
                         if (success) {
                             document.getElementById('loginshizzle').hidden = true;
                             document.getElementById('loginmessage').innerText = '';
+                            pywebview.api.loadSchoolyears().then(loadSchoolyears);
                             document.getElementById('ttloadbtn').disabled = false;
                         } else {
                             document.getElementById('loginmessage').innerText = 'Login failed';
@@ -57,6 +61,32 @@
                     }
                 )
             }
+
+            let schoolyears;
+            function loadSchoolyears(res) {
+                schoolyears = res;
+                let combo = document.getElementById('schoolyears');
+                Object.keys(schoolyears).forEach(function(val, idx, arr) {
+                    let o = document.createElement('option');
+                    o.value = val;
+                    o.text = schoolyears[val]['name'];
+                    combo.add(o);
+                    o.selected = true; // select the last added option
+                });
+                combo.onchange();
+            }
+
+            // callback function for schoolyears dropdown value change
+            function setTtLimits() {
+                let scyearsel = document.getElementById('schoolyears');
+                let yearattrs = schoolyears[scyearsel.value];
+                if (yearattrs) {
+                    let ttdatesel = document.getElementById('ttdate');
+                    ttdatesel.min = yearattrs['start'];
+                    ttdatesel.max = yearattrs['end'];
+                }
+            }
+
             function createTimetable() { 
                 var tt = document.getElementById('timetable');
                 let tr = document.createElement('tr');

@@ -16,6 +16,19 @@ def untisLogin(username, passwd):
     untis_session = py_ap_untis.get_session()
     return bool(untis_session)
 
+def _data4schoolyear(schoolyear):
+    return {
+        'id': schoolyear.id,
+        'start': schoolyear.start.date().isoformat(),
+        'end': schoolyear.end.date().isoformat(),
+        'current': schoolyear.is_current,
+        'name': schoolyear.name.replace('/', '-')
+    }
+
+def loadSchoolyears():
+    global untis_session
+    return {e.id: _data4schoolyear(e) for e in untis_session.schoolyears()}
+
 def getTeacherTable(teacher, tbldate):
     '''
     Return the timetable for the given teacher (numeric id) and the tbldate
@@ -34,5 +47,5 @@ def getTeacherTable(teacher, tbldate):
 
 
 ui = webview.create_window('Untapped', url='./untapped.html')
-ui.expose(untisLogin, getTeacherTable)
+ui.expose(untisLogin, loadSchoolyears, getTeacherTable)
 webview.start(debug=True)
