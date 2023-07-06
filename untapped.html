@@ -36,7 +36,7 @@
         <div>
             <input id="ttdate" type="date" value="2023-09-18" />
             <input id="ttteacher" type="text" value="3817">
-            <button onclick="on_tt_button()">Load Timetable</button>
+            <button id="ttloadbtn" disabled="true" onclick="on_tt_button()">Load Timetable</button>
         </div>
         <script>
             function untislogin() {
@@ -47,6 +47,7 @@
                         if (success) {
                             document.getElementById('loginshizzle').hidden = true;
                             document.getElementById('loginmessage').innerText = '';
+                            document.getElementById('ttloadbtn').disabled = false;
                         } else {
                             document.getElementById('loginmessage').innerText = 'Login failed';
                         }
