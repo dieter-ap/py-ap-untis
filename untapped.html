@@ -14,64 +14,63 @@
     </head>
     <body>
         <table id="timetable" class="timetable"></table>
-    </body>
-    <script>
-        function createTimetable() { 
-            var tt = document.getElementById('timetable');
-            let tr = document.createElement('tr');
-            tt.appendChild(tr);
-            ['', 'Maandag', 'Dinsdag', 'Woesndag', 'Donderdag', 'Vrijdag'].forEach(function(val, idx, arr) {
-                let th = document.createElement('th');
-                th.innerText = val;
-                tr.appendChild(th);
-            })
-            for (let hour = 8; hour < 22; hour++) {
+        <div>
+            <input id="ttdate" type="date" value="2023-09-18" />
+            <input id="ttteacher" type="text" value="3817">
+            <button onclick="on_tt_button()">Load Timetable</button>
+        </div>
+        <script>
+            function createTimetable() { 
+                var tt = document.getElementById('timetable');
                 let tr = document.createElement('tr');
-                tr.id = 'tm_' + hour.toString();
                 tt.appendChild(tr);
-                for (let day = 0; day < 6; day++) {
-                    let td = document.createElement('td');
-                    td.id = 'tt_d' + day.toString() + '_tm' + hour.toString();
-                    if (day == 0) {
-                        td.innerText = hour.toString() + 'u';
+                ['', 'Maandag', 'Dinsdag', 'Woesndag', 'Donderdag', 'Vrijdag'].forEach(function(val, idx, arr) {
+                    let th = document.createElement('th');
+                    th.innerText = val;
+                    tr.appendChild(th);
+                })
+                for (let hour = 8; hour < 22; hour++) {
+                    let tr = document.createElement('tr');
+                    tr.id = 'tm_' + hour.toString();
+                    tt.appendChild(tr);
+                    for (let day = 0; day < 6; day++) {
+                        let td = document.createElement('td');
+                        td.id = 'tt_d' + day.toString() + '_tm' + hour.toString();
+                        if (day == 0) {
+                            td.innerText = hour.toString() + 'u';
+                        }
+                        tr.appendChild(td);
                     }
-                    tr.appendChild(td);
                 }
             }
-        }
-        createTimetable();
+            createTimetable();
 
-        // Add one element to the timetable
-        function addTtEl(val, idx, arr) {
-            let col = val.day;
-            let row = val.startTime / 100;
-            let cell_id = 'tt_d' + col.toString() + '_tm' + row.toString();
-            let cell = document.getElementById(cell_id);
-            let content = document.createElement('span')
-            let el_class = 'te_' + val.te[0].id; // XXX need to have this per timetable type
-            content.class = el_class;
-            content.innerText = '🟢';
-            content.title = 'L: ' + val.te[0].id + ', O: ' + val.su[0].id + ', G: ' + val.kl[0].id;
-            cell.appendChild(content);
-        }
+            // Add one element to the timetable
+            function addTtEl(val, idx, arr) {
+                let col = val.day;
+                let row = val.startTime / 100;
+                let cell_id = 'tt_d' + col.toString() + '_tm' + row.toString();
+                let cell = document.getElementById(cell_id);
+                let content = document.createElement('span')
+                let el_class = 'te_' + val.te[0].id; // XXX need to have this per timetable type
+                content.class = el_class;
+                content.innerText = '🟢';
+                content.title = 'L: ' + val.te[0].id + ', O: ' + val.su[0].id + ', G: ' + val.kl[0].id;
+                cell.appendChild(content);
+            }
 
-        let x; // for debug
-        // callback function for the Load Timetable button
-        function loadTimetable(tt) {
-            x = tt; // for debug
-            tt.forEach(addTtEl);
-        }
+            let x; // for debug
+            // callback function for the Load Timetable button
+            function loadTimetable(tt) {
+                x = tt; // for debug
+                tt.forEach(addTtEl);
+            }
 
-        function on_tt_button() {
-            let ttdate = document.getElementById('ttdate').value;
-            let ttteacher = document.getElementById('ttteacher').value;
-            pywebview.api.getTeacherTable(ttteacher, ttdate).then(loadTimetable);
-        }
-    </script>
-
-    <div>
-        <input id="ttdate" type="date" value="2023-09-18" />
-        <input id="ttteacher" type="text" value="3817">
-        <button onclick="on_tt_button()">Load Timetable</button>
-    </div>
+            function on_tt_button() {
+                let ttdate = document.getElementById('ttdate').value;
+                let ttteacher = document.getElementById('ttteacher').value;
+                pywebview.api.getTeacherTable(ttteacher, ttdate).then(loadTimetable);
+            }
+        </script>
+    </body>
 </html>
