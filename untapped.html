@@ -30,9 +30,12 @@
                 <span id="loginmessage"></span>
             </div>
         </div> <!-- #loginshizzle -->
-        <div>
-            <select name="schoolyears" id="schoolyears" onchange="setTtLimits()"></select>
-        </div>
+        <button id="toggleSettings" disabled="true" onclick="toggleSettings()">▼</button>
+        <div id="settings" hidden="true">
+            <div>
+                <select name="schoolyears" id="schoolyears" onchange="setTtLimits()"></select>
+            </div>
+        </div> <!-- #settings -->
         <div>
             <table id="timetable" class="timetable"></table>
         </div>
@@ -41,12 +44,25 @@
             <input id="ttteacher" type="text" value="3817">
             <button id="ttloadbtn" disabled="true" onclick="on_tt_button()">Load Timetable</button>
         </div>
+
         <script>
             window.addEventListener('pywebviewready', function() {
                 pywebview.api.getConfig('untisUser').then(function(val) {
                     document.getElementById('untisuser').value = val;
                 })
             })
+
+            function toggleSettings() {
+                let btn = document.getElementById('toggleSettings');
+                let settings = document.getElementById('settings');
+                if (settings.hidden) {
+                    settings.hidden = false;
+                    btn.textContent = '▲';
+                } else {
+                    settings.hidden = true;
+                    btn.textContent = '▼';
+                }
+            }
 
             function untislogin() {
                 let user = document.getElementById('untisuser').value;
@@ -57,6 +73,7 @@
                             document.getElementById('loginshizzle').hidden = true;
                             document.getElementById('loginmessage').innerText = '';
                             pywebview.api.loadSchoolyears().then(loadSchoolyears);
+                            document.getElementById('toggleSettings').disabled = false;
                             document.getElementById('ttloadbtn').disabled = false;
                         } else {
                             document.getElementById('loginmessage').innerText = 'Login failed';
