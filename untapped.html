@@ -13,6 +13,9 @@
             .timetable td,th {
                 border: solid 1px;
             }
+            #teacherLookup {
+                border: darkred solid 1px;
+            }
         </style>
     </head>
     <body>
@@ -36,6 +39,23 @@
                 <label for="schoolyears">Schoolyear:</label>
                 <select name="schoolyears" id="schoolyears" onchange="setTtLimits()"></select>
             </div>
+            <div id="teacherLookup">
+                Add a teacher.
+                <div>
+                    <label for="tlFirstName">First Name:</label>
+                    <input id="tlFirstName" name="tlFirstName"> 
+                </div>
+                <div>
+                    <label for="tlLastName">Last Name:</label>
+                    <input id="tlLastName" name="tlLastName"> 
+                </div>
+                <div>
+                    <label for="tlRemember">Remember:</label>
+                    <input type="checkbox" name="tlRemember" id="tlRemember" checked="true">
+                    <button onclick="teacherLookup()">Search</button>
+                    <span id="tlMessage"></span>
+                </div>
+            </div>
             <div>
                 <button onclick="untislogout()">Logout</button>
             </div>
@@ -45,7 +65,8 @@
         </div>
         <div>
             <input id="ttdate" type="date">
-            <input id="ttteacher" type="text" value="3817">
+            <select id="ttteacher">
+            </select>
             <button id="ttloadbtn" disabled="true" onclick="on_tt_button()">Load Timetable</button>
         </div>
 
@@ -78,6 +99,7 @@
                             document.getElementById('loginmessage').innerText = '';
                             pywebview.api.loadSchoolyears().then(loadSchoolyears);
                             document.getElementById('toggleSettings').disabled = false;
+                            pywebview.api.loadTeachers().then(loadTeachers);
                             document.getElementById('ttloadbtn').disabled = false;
                         } else {
                             document.getElementById('loginmessage').innerText = 'Login failed';
@@ -98,6 +120,24 @@
                         document.getElementById('ttloadbtn').disabled = true;
                     }
                 );
+            }
+
+            function teacherLookup() {
+                let firstName = document.getElementById('tlFirstName').value;
+                let lastName = document.getElementById('tlLastName').value;
+                let remember = document.getElementById('tlRemember').checked;
+                pywebview.api.findTeacher(firstName, lastName, remember).then(function(res) {
+                    let msgField = document.getElementById('tlMessage');
+                    if (res) {
+                        teachers[res.id] = res;
+                        loadTeachers(teachers);
+                        msgField.innerText = 'Teacher ' + res.name + ' was added';
+                        document.getElementById('tlFirstName').value = '';
+                        document.getElementById('tlLastName').value = '';
+                    } else {
+                        msgField.innerText = 'This teacher could not be found';
+                    }
+                });
             }
 
             let schoolyears;
@@ -123,6 +163,25 @@
                     ttdatesel.min = yearattrs['start'];
                     ttdatesel.max = yearattrs['end'];
                 }
+            }
+
+            let teachers;
+            function loadTeachers(res) {
+                teachers = res;
+                let combo = document.getElementById('ttteacher');
+                let keys = Object.keys(res);
+                keys.sort(function(a, b) {
+                    return res[a].name > res[b].name ? 1 : -1;
+                });
+                while (combo.length > 0) {
+                    combo.remove(combo.length - 1);
+                }
+                keys.forEach(function(val, idx, arr) {
+                    let o = document.createElement('option');
+                    o.value = val;
+                    o.text = res[val]['name'];
+                    combo.add(o);
+                });
             }
 
             function createTimetable() { 
