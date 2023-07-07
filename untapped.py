@@ -12,11 +12,11 @@ import py_ap_untis
 
 config = {}
 
-def getConfig(key):
+def getConfig(key, missingVal=None):
     global config
     if not config.get('configVersion'):
         loadConfig()
-    return config.get(key)
+    return config.get(key, missingVal)
 
 def setConfig(key, value, save=True):
     global config
