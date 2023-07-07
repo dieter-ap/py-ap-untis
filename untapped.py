@@ -94,7 +94,7 @@ def findTeacher(firstName, lastName, remember=True):
             setConfig('teachers', teachers)
         return ret
 
-def getTeacherTable(teacher, tbldate):
+def getTimeTable(tbltype, id, tbldate):
     '''
     Return the timetable for the given teacher (numeric id) and the tbldate
     which needs to be in isoformat.
@@ -104,7 +104,7 @@ def getTeacherTable(teacher, tbldate):
     day1 -= datetime.timedelta(days=day1.weekday())
     tt = untis_session.timetable(start=day1,
                                  end=(day1 + datetime.timedelta(days=4)),
-                                 teacher=teacher,
+                                 **{tbltype: id},
                                  from_cache=True)
     return [{
         'day': e.start.isoweekday(),
@@ -119,5 +119,5 @@ def getTeacherTable(teacher, tbldate):
 
 ui = webview.create_window('Untapped', url='./untapped.html')
 ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
-          loadTeachers, findTeacher, getTeacherTable)
+          loadTeachers, findTeacher, getTimeTable)
 webview.start(debug=True)
