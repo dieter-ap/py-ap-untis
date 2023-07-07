@@ -207,6 +207,7 @@
                     }
                 }
             }
+            createTimetable();
 
             // Add one element to the timetable
             function addTtEl(val, idx, arr) {
@@ -223,7 +224,6 @@
                 content.title = title;
                 cell.appendChild(content);
             }
-            createTimetable();
 
             let x; // for debug
             // callback function for the Load Timetable button
