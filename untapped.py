@@ -86,7 +86,6 @@ def getTeacherTable(teacher, tbldate):
     Return the timetable for the given teacher (numeric id) and the tbldate
     which needs to be in isoformat.
     '''
-    #s = py_ap_untis.get_session()
     global untis_session
     day1 = datetime.date.fromisoformat(tbldate)
     tt = untis_session.timetable(start=day1,
