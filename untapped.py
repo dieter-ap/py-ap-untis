@@ -58,6 +58,11 @@ def untisLogin(username, passwd):
         setConfig('untisUser', username)
     return bool(untis_session)
 
+def untisLogout():
+    global untis_session
+    if untis_session:
+        untis_session.logout(suppress_errors=True)
+
 def _data4schoolyear(schoolyear):
     return {
         'id': schoolyear.id,
@@ -89,5 +94,6 @@ def getTeacherTable(teacher, tbldate):
 
 
 ui = webview.create_window('Untapped', url='./untapped.html')
-ui.expose(getConfig, untisLogin, loadSchoolyears, getTeacherTable)
+ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
+          getTeacherTable)
 webview.start(debug=True)

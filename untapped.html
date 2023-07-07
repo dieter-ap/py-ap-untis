@@ -36,6 +36,9 @@
                 <label for="schoolyears">Schoolyear:</label>
                 <select name="schoolyears" id="schoolyears" onchange="setTtLimits()"></select>
             </div>
+            <div>
+                <button onclick="untislogout()">Logout</button>
+            </div>
         </div> <!-- #settings -->
         <div>
             <table id="timetable" class="timetable"></table>
@@ -84,6 +87,17 @@
                         document.getElementById('loginmessage').innerText = error;
                     }
                 )
+            }
+
+            function untislogout() {
+                pywebview.api.untisLogout().then(
+                    function() {
+                        toggleSettings(); // Hide settings which we know are shown, because we get here
+                        document.getElementById('loginshizzle').hidden = false;
+                        document.getElementById('toggleSettings').disabled = true;
+                        document.getElementById('ttloadbtn').disabled = true;
+                    }
+                );
             }
 
             let schoolyears;
