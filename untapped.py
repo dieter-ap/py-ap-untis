@@ -101,6 +101,7 @@ def getTeacherTable(teacher, tbldate):
     '''
     global untis_session
     day1 = datetime.date.fromisoformat(tbldate)
+    day1 -= datetime.timedelta(days=day1.weekday())
     tt = untis_session.timetable(start=day1,
                                  end=(day1 + datetime.timedelta(days=4)),
                                  teacher=teacher)
