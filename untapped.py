@@ -1,4 +1,7 @@
 import datetime
+import json
+import os
+from pathlib import Path
 
 try:
     import webview
@@ -6,6 +9,42 @@ except ImportError:
     exit('install the pywebview package')
 
 import py_ap_untis
+
+config = {}
+
+def getConfig(key):
+    global config
+    if not config.get('configVersion'):
+        loadConfig()
+    return config.get(key)
+
+def setConfig(key, value, save=True):
+    global config
+    changed = (getConfig(key) != value)
+    config[key] = value
+    if changed and save:
+        saveConfig()
+
+def _configPath(mkdir=False):
+    configDir = os.path.join(Path.home(), '.untapped')
+    configFile = os.path.join(configDir, 'config')
+    if mkdir and not os.path.isdir(configDir):
+        os.mkdir(configDir)
+    return configFile
+
+def loadConfig():
+    global config
+    configFile = _configPath()
+    if os.path.isfile(configFile):
+        with open(configFile, 'r') as inp:
+            config.update(json.load(inp))
+            config['configVersion'] = '1.0'
+
+def saveConfig():
+    global config
+    configFile = _configPath(True)
+    with open(configFile, 'w') as out:
+        json.dump(config, out, indent=2)
 
 untis_session = None
 
@@ -16,6 +55,7 @@ def untisLogin(username, passwd):
     untis_session = py_ap_untis.get_session()
     if untis_session:
         untis_session.config['login_repeat'] = 1
+        setConfig('untisUser', username)
     return bool(untis_session)
 
 def _data4schoolyear(schoolyear):
@@ -49,5 +89,5 @@ def getTeacherTable(teacher, tbldate):
 
 
 ui = webview.create_window('Untapped', url='./untapped.html')
-ui.expose(untisLogin, loadSchoolyears, getTeacherTable)
+ui.expose(getConfig, untisLogin, loadSchoolyears, getTeacherTable)
 webview.start(debug=True)

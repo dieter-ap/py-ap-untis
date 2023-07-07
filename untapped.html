@@ -42,6 +42,12 @@
             <button id="ttloadbtn" disabled="true" onclick="on_tt_button()">Load Timetable</button>
         </div>
         <script>
+            window.addEventListener('pywebviewready', function() {
+                pywebview.api.getConfig('untisUser').then(function(val) {
+                    document.getElementById('untisuser').value = val;
+                })
+            })
+
             function untislogin() {
                 let user = document.getElementById('untisuser').value;
                 let pass = document.getElementById('untispass').value;
