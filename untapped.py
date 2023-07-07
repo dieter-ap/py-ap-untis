@@ -105,10 +105,15 @@ def getTeacherTable(teacher, tbldate):
     tt = untis_session.timetable(start=day1,
                                  end=(day1 + datetime.timedelta(days=4)),
                                  teacher=teacher)
-    for e in tt:
-        day = (e.start.date() - day1).days + 1
-        e._data['day'] = day
-    return [e._data for e in tt]
+    return [{
+        'day': e.start.isoweekday(),
+        'id': e.id,
+        'groups': [{'id': k.id, 'name': k.name, 'long_name': k.long_name} for k in e.klassen],
+        'rooms': [{'id': r.id, 'name': r.name, 'long_name': r.long_name} for r in e.rooms],
+        'subjects': [{'id': s.id, 'name': s.name, 'long_name': s.long_name} for s in e.subjects],
+        'teachers': e._data['te'],
+        'time': e.start.hour
+    } for e in tt]
 
 
 ui = webview.create_window('Untapped', url='./untapped.html')

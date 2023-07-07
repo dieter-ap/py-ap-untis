@@ -210,15 +210,17 @@
 
             // Add one element to the timetable
             function addTtEl(val, idx, arr) {
-                let col = val.day;
-                let row = val.startTime / 100;
-                let cell_id = 'tt_d' + col.toString() + '_tm' + row.toString();
+                let cell_id = 'tt_d' + val.day.toString() + '_tm' + val.time.toString();
                 let cell = document.getElementById(cell_id);
                 let content = document.createElement('span')
-                let el_class = 'te_' + val.te[0].id; // XXX need to have this per timetable type
+                let el_class = 'te_' + val.teachers[0].id; // XXX need to have this per timetable type
                 content.className = el_class;
                 content.innerText = '🟢';
-                content.title = 'L: ' + val.te[0].id + ', O: ' + val.su[0].id + ', G: ' + val.kl[0].id;
+                let title = 'T: ' + teachers[val.teachers[0].id].name
+                title += ', S: ' + val.subjects[0].long_name
+                title += ', G: ' + val.groups[0].name // XXX need to use all groups
+                title += ', R: ' + val.rooms[0].name
+                content.title = title;
                 cell.appendChild(content);
             }
             createTimetable();
