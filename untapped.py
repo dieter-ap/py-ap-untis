@@ -19,8 +19,13 @@ def getConfig(key, missingVal=None):
     return config.get(key, missingVal)
 
 def setConfig(key, value, save=True):
+    '''
+    Change the value of key. The new value is immediately written to the
+    configuration file if save is True.
+    '''
     global config
-    changed = (getConfig(key) != value)
+    # Only write config if value is changed, or if we cannot easily see it.
+    changed = (not value.__hash__ or getConfig(key) != value)
     config[key] = value
     if changed and save:
         saveConfig()
