@@ -213,13 +213,13 @@
             function addTtEl(val, idx, ttable) {
                 let cell_id = 'tt_d' + val.day.toString() + '_tm' + val.time.toString();
                 let cell = document.getElementById(cell_id);
-                let content = document.createElement('span')
+                let content = document.createElement('span');
                 let el_class = ttable.tbltype + '_' + ttable.objid;
                 content.className = el_class;
                 content.innerText = ttable.symbol;
-                let title = 'T: ' + teachers[val.teachers[0].id].name
-                title += ', S: ' + val.subjects[0].long_name
-                title += ', G: ' + val.groups[0].name // XXX need to use all groups
+                let title = 'T: ' + teachers[val.teachers[0].id].name;
+                title += ', S: ' + val.subjects[0].long_name;
+                title += ', G: ' + val.groups[0].name; // XXX need to use all groups
                 title += ', R: ' + val.rooms[0].name
                 content.title = title;
                 cell.appendChild(content);
