@@ -210,13 +210,13 @@
             createTimetable();
 
             // Add one element to the timetable
-            function addTtEl(val, idx, arr) {
+            function addTtEl(val, idx, ttable) {
                 let cell_id = 'tt_d' + val.day.toString() + '_tm' + val.time.toString();
                 let cell = document.getElementById(cell_id);
                 let content = document.createElement('span')
-                let el_class = 'te_' + val.teachers[0].id; // XXX need to have this per timetable type
+                let el_class = ttable.tbltype + '_' + ttable.objid;
                 content.className = el_class;
-                content.innerText = '🟢';
+                content.innerText = ttable.symbol;
                 let title = 'T: ' + teachers[val.teachers[0].id].name
                 title += ', S: ' + val.subjects[0].long_name
                 title += ', G: ' + val.groups[0].name // XXX need to use all groups
@@ -229,7 +229,12 @@
             // callback function for the Load Timetable button
             function loadTimetable(tt) {
                 x = tt; // for debug
-                tt.forEach(addTtEl);
+                tbl = {
+                    'tbltype': tt.tbltype,
+                    'objid': tt.objid,
+                    'symbol': '🟢'
+                };
+                tt.table.forEach(function(val, idx, arr) { addTtEl(val, idx, tbl); });
             }
 
             function on_tt_button() {

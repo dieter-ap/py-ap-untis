@@ -106,7 +106,7 @@ def getTimeTable(tbltype, id, tbldate):
                                  end=(day1 + datetime.timedelta(days=4)),
                                  **{tbltype: id},
                                  from_cache=True)
-    return [{
+    table = [{
         'day': e.start.isoweekday(),
         'id': e.id,
         'groups': [{'id': k.id, 'name': k.name, 'long_name': k.long_name} for k in e.klassen],
@@ -115,6 +115,11 @@ def getTimeTable(tbltype, id, tbldate):
         'teachers': e._data['te'],
         'time': e.start.hour
     } for e in tt]
+    return {
+        'objid': id,
+        'table': table,
+        'tbltype': tbltype
+    }
 
 
 ui = webview.create_window('Untapped', url='./untapped.html')
