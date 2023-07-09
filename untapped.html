@@ -280,11 +280,20 @@
                 let el_class = ttable.tbltype + '_' + ttable.objid;
                 content.className = el_class;
                 content.innerText = ttable.symbol;
-                let title = 'T: ' + teachers[val.teachers[0].id].name;
-                title += ', S: ' + val.subjects[0].long_name;
-                title += ', G: ' + val.groups[0].name; // XXX need to use all groups
-                title += ', R: ' + val.rooms[0].name
-                content.title = title;
+                let title = [];
+                if (val.teachers.length) {
+                    title.push('T: ' + teachers[val.teachers[0].id].name);
+                }
+                if (val.subjects.length) {
+                    title.push('S: ' + val.subjects[0].long_name);
+                }
+                if (val.groups.length) {
+                    title.push('G: ' + val.groups[0].name); // XXX need to use all groups
+                }
+                if (val.rooms.length) {
+                    title.push('R: ' + val.rooms[0].name);
+                }
+                content.title = title.join(', ');
                 cell.appendChild(content);
             }
 
