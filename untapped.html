@@ -65,8 +65,8 @@
         </div>
         <div>
             <input id="ttdate" type="date">
-            <select id="ttteacher">
-            </select>
+            <select id="ttteacher"></select>
+            <select id="ttsymbol"></select>
             <button id="ttloadbtn" disabled="true" onclick="on_tt_button()">Load Timetable</button>
         </div>
 
@@ -184,6 +184,69 @@
                 });
             }
 
+            let symbols = {
+                'unused': {
+                    'circles': ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫'],
+                    'squares': ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛']
+                },
+                'used': {
+                    'circles': [],
+                    'squares': []
+                }
+            }
+            // Set the contents of the symbols dropdown
+            function loadSymbols() {
+                let combo = document.getElementById('ttsymbol');
+                while (combo.length > 0) {
+                    combo.remove(combo.length - 1);
+                }
+                let unused = combo;
+                let used;
+                if (symbols.used.circles.length + symbols.used.squares.length > 0) {
+                    if (unused = document.getElementById('ttsymbol-unused')) {
+                        used = document.getElementById('ttsymbol-used');
+                    } else {
+                        unused = document.createElement('optgroup');
+                        unused.label = 'Unused';
+                        unused.id = 'ttsymbol-unused';
+                        combo.add(unused);
+                        used = document.createElement('optgroup');
+                        used.label = 'Used';
+                        used.id = 'ttsymbol-used';
+                        combo.add(used);
+                    }
+                }
+                symbols.unused.circles.forEach(function(val) { _loadSymbol(unused, val, 'unused', 'circles'); });
+                symbols.unused.squares.forEach(function(val) { _loadSymbol(unused, val, 'unused', 'squares'); });
+                symbols.used.circles.forEach(function(val) { _loadSymbol(used, val, 'used', 'circles'); });
+                symbols.used.squares.forEach(function(val) { _loadSymbol(used, val, 'used', 'squares'); });
+            }
+            function _loadSymbol(container, val, used, collection) {
+                let opt = document.createElement('option');
+                opt.value = val;
+                opt.text = val;
+                opt.dataset.used = used;
+                opt.dataset.collection = collection;
+                container.appendChild(opt);
+            }
+            loadSymbols();
+
+            // Return the selected symbol and moved it to the right 'used' list
+            // if previously unused.
+            function selectSymbol() {
+                let combo = document.getElementById('ttsymbol');
+                let selected = combo.options[combo.selectedIndex];
+                if (selected.dataset.used == 'unused') {
+                    let coll = selected.dataset.collection;
+                    let symlist = symbols['unused'][coll];
+                    let idx = symlist.findIndex(function(v) { return v == combo.value; })
+                    symbols['used'][coll] = symbols['used'][coll].concat(symlist.splice(idx, 1));
+                }
+                let val = combo.value;
+                loadSymbols();
+                return val;
+            }
+
             function createTimetable() { 
                 var tt = document.getElementById('timetable');
                 let tr = document.createElement('tr');
@@ -232,7 +295,7 @@
                 tbl = {
                     'tbltype': tt.tbltype,
                     'objid': tt.objid,
-                    'symbol': '🟢'
+                    'symbol': selectSymbol()
                 };
                 tt.table.forEach(function(val, idx, arr) { addTtEl(val, idx, tbl); });
             }
