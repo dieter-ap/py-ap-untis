@@ -17,12 +17,6 @@
             .timetable td, .timetable th {
                 border: solid 1px;
             }
-            div#loadedTablesContainer {
-                border: solid 1px;
-            }
-            #loadedTables tr:nth-child(odd) {
-                background-color: honeydew;
-            }
             #teacherLookup {
                 border: darkred solid 1px;
             }
@@ -75,14 +69,6 @@
         </div>
         <div id="loadedTablesContainer" hidden="true">
             <table>
-                <caption>Loaded tables.</caption>
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Symbol</th>
-                    </tr>
-                </thead>
                 <tbody id="loadedTables"></tbody>
             </table>
         </div>
@@ -301,7 +287,7 @@
             function addLoadedTable(tbldata, name) {
                 let table = document.getElementById('loadedTables');
                 let tr = document.createElement('tr');
-                [tbldata.tbltype, name, tbldata.symbol].forEach(function(val) {
+                [tbldata.symbol, name].forEach(function(val) {
                     let td = document.createElement('td');
                     td.innerText = val;
                     tr.appendChild(td);
