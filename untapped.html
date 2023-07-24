@@ -333,6 +333,7 @@
                     'objid': tt.objid,
                     'symbol': selectSymbol()
                 };
+                //timetables[tt.tbltype + '_' + tt.objid] = tbl;
                 addLoadedTable(tbl, name);
                 tt.table.forEach(function(val, idx, arr) { addTtEl(val, idx, tbl); });
             }
