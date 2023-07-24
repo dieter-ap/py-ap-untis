@@ -256,12 +256,14 @@
                 return val;
             }
 
+            // Create the table where schedules will be shown
             function createTimetable() { 
                 var tt = document.getElementById('timetable');
                 let tr = document.createElement('tr');
                 tt.appendChild(tr);
-                ['', 'Maandag', 'Dinsdag', 'Woesndag', 'Donderdag', 'Vrijdag'].forEach(function(val, idx, arr) {
+                ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(function(val, idx, arr) {
                     let th = document.createElement('th');
+                    th.id = 'th_' + idx.toString();
                     th.innerText = val;
                     tr.appendChild(th);
                 })
