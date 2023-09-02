@@ -277,11 +277,15 @@
 
                 let tr = document.createElement('tr');
                 tt.appendChild(tr);
-                ['Week of ' + dt, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(function(val, idx, arr) {
+                pywebview.api.getDateFormats(dt, '%b', '%a %d').then(function(res) {
+                    res.forEach(function(val, idx, arr) {
+                        if (idx < 6) {
                     let th = document.createElement('th');
                     th.innerText = val;
                     tr.appendChild(th);
-                })
+                        }
+                    });
+                });
                 for (let hour = 8; hour < 22; hour++) {
                     let tr = document.createElement('tr');
                     tr.id = 'tm_' + ttidx.toString() + '_' + hour.toString();

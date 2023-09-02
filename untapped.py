@@ -81,6 +81,16 @@ def loadSchoolyears():
     global untis_session
     return {e.id: _data4schoolyear(e) for e in untis_session.schoolyears()}
 
+def getDateFormats(datestr, wfmt, dfmt):
+    '''
+    Find the first day of the week datestr occurs in; format it according to
+    wfmt, and for each weekday according to dfmt.
+    '''
+    dt = datetime.date.fromisoformat(datestr)
+    mon = dt - datetime.timedelta(days=dt.weekday())
+    return [mon.strftime(wfmt)] + [
+        (mon + datetime.timedelta(days=i)).strftime(dfmt) for i in range(7)]
+
 def loadTeachers():
     return getConfig('teachers', {})
 
@@ -124,5 +134,5 @@ def getTimeTable(tbltype, id, tbldate):
 
 ui = webview.create_window('Untapped', url='./untapped.html')
 ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
-          loadTeachers, findTeacher, getTimeTable)
+          getDateFormats, loadTeachers, findTeacher, getTimeTable)
 webview.start(debug=True)
