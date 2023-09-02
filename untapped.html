@@ -37,7 +37,7 @@
                 <span id="loginmessage"></span>
             </div>
         </div> <!-- #loginshizzle -->
-        <button id="toggleSettings" disabled="true" onclick="toggleSettings()">▼</button>
+        <button id="toggleSettings" disabled="true" hidden=true onclick="toggleSettings()">▼</button>
         <div id="settings" hidden="true">
             <div>
                 <label for="schoolyears">Schoolyear:</label>
@@ -64,20 +64,13 @@
                 <button onclick="untislogout()">Logout</button>
             </div>
         </div> <!-- #settings -->
-        <div>
-            <table id="timetable" class="timetable"></table>
-        </div>
-        <div id="loadedTablesContainer" hidden="true">
-            <table>
-                <tbody id="loadedTables"></tbody>
-            </table>
-        </div>
-        <div>
+        
+        <div id="timetables"></div>
+        <div id="addContainer" hidden="true">
             <input id="ttdate" type="date">
-            <select id="ttteacher"></select>
-            <select id="ttsymbol"></select>
-            <button id="ttloadbtn" disabled="true" onclick="on_tt_button()">Load Timetable</button>
+            <button onclick="addTimetable()">New Timetable</button>
         </div>
+
 
         <script>
             window.addEventListener('pywebviewready', function() {
@@ -108,8 +101,9 @@
                             document.getElementById('loginmessage').innerText = '';
                             pywebview.api.loadSchoolyears().then(loadSchoolyears);
                             document.getElementById('toggleSettings').disabled = false;
+                            document.getElementById('toggleSettings').hidden = false;
                             pywebview.api.loadTeachers().then(loadTeachers);
-                            document.getElementById('ttloadbtn').disabled = false;
+                            document.getElementById('addContainer').hidden = false;
                         } else {
                             document.getElementById('loginmessage').innerText = 'Login failed';
                         }
@@ -123,7 +117,7 @@
             function untislogout() {
                 pywebview.api.untisLogout().then(
                     function() {
-                        toggleSettings(); // Hide settings which we know are shown, because we get here
+                        toggleSettings(); // Hide settings (we know they are shown, because we get here)
                         document.getElementById('loginshizzle').hidden = false;
                         document.getElementById('toggleSettings').disabled = true;
                         document.getElementById('ttloadbtn').disabled = true;
@@ -175,53 +169,52 @@
             }
 
             let teachers;
-            function loadTeachers(res) {
-                teachers = res;
-                let combo = document.getElementById('ttteacher');
-                let keys = Object.keys(res);
-                keys.sort(function(a, b) {
-                    return res[a].name > res[b].name ? 1 : -1;
-                });
+
+            /* The following function is used to add all teachers to one combo
+                box. It is called by loadTeachers, and also when a new combo is
+                added. This could probably be improved (made more efficient). */
+            function populateTeacherSelect(combo) {
                 while (combo.length > 0) {
                     combo.remove(combo.length - 1);
                 }
+                let keys = Object.keys(teachers);
+                keys.sort(function(a, b) {
+                    return teachers[a].name > teachers[b].name ? 1 : -1;
+                });
                 keys.forEach(function(val, idx, arr) {
                     let o = document.createElement('option');
                     o.value = val;
-                    o.text = res[val]['name'];
+                    o.text = teachers[val]['name'];
                     combo.add(o);
                 });
             }
 
-            let symbols = {
-                'unused': {
-                    'circles': ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫'],
-                    'squares': ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛']
-                },
-                'used': {
-                    'circles': [],
-                    'squares': []
-                }
+            function loadTeachers(res) {
+                teachers = res; // assign to global
+                document.querySelectorAll(".selectTeacher").forEach(populateTeacherSelect);
             }
-            // Set the contents of the symbols dropdown
-            function loadSymbols() {
-                let combo = document.getElementById('ttsymbol');
+
+            let timetables = {}; // all the existing tables
+            let ttidx = 0; // last used table index
+
+            // Set the contents of the symbols dropdown for a given table (index)
+            function loadSymbols(tbl) {
+                let combo = document.querySelector('#tmtblct' + tbl.toString() + ' .selectSymbol');
                 while (combo.length > 0) {
                     combo.remove(combo.length - 1);
                 }
                 let unused = combo;
                 let used;
+                let symbols = timetables[tbl].symbols;
                 if (symbols.used.circles.length + symbols.used.squares.length > 0) {
-                    if (unused = document.getElementById('ttsymbol-unused')) {
-                        used = document.getElementById('ttsymbol-used');
+                    if (unused = combo.querySelector('optgroup[label="Unused"]')) {
+                        used = document.querySelector('optgroup[label="Used"]');
                     } else {
                         unused = document.createElement('optgroup');
                         unused.label = 'Unused';
-                        unused.id = 'ttsymbol-unused';
                         combo.add(unused);
                         used = document.createElement('optgroup');
                         used.label = 'Used';
-                        used.id = 'ttsymbol-used';
                         combo.add(used);
                     }
                 }
@@ -238,12 +231,12 @@
                 opt.dataset.collection = collection;
                 container.appendChild(opt);
             }
-            loadSymbols();
 
-            // Return the selected symbol and moved it to the right 'used' list
+            // Return the selected symbol and move it to the right 'used' list
             // if previously unused.
-            function selectSymbol() {
-                let combo = document.getElementById('ttsymbol');
+            function selectSymbol(tbl) {
+                let symbols = timetables[tbl].symbols;
+                let combo = document.querySelector('#tmtblct' + tbl.toString() + ' .selectSymbol');
                 let selected = combo.options[combo.selectedIndex];
                 if (selected.dataset.used == 'unused') {
                     let coll = selected.dataset.collection;
@@ -252,56 +245,107 @@
                     symbols['used'][coll] = symbols['used'][coll].concat(symlist.splice(idx, 1));
                 }
                 let val = combo.value;
-                loadSymbols();
+                loadSymbols(tbl);
                 return val;
             }
 
-            // Create the table where schedules will be shown
-            function createTimetable() { 
-                var tt = document.getElementById('timetable');
+            function addTimetable() {
+                ttidx += 1;
+                let dt = document.getElementById('ttdate').value;
+                timetables[ttidx] = {
+                    'date': dt,
+                    'symbols': {
+                        'unused': {
+                            'circles': ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫'],
+                            'squares': ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛']
+                        },
+                        'used': {
+                            'circles': [],
+                            'squares': []
+                        }
+                    }
+                }
+                var el_tables = document.getElementById('timetables');
+                let ttd = document.createElement('div');
+                ttd.id = 'tmtblct' + ttidx.toString();
+                el_tables.appendChild(ttd);
+
+                let tt = document.createElement('table');
+                tt.id = 'tmtbl' + ttidx.toString();
+                tt.className = 'timetable';
+                ttd.appendChild(tt);
+
                 let tr = document.createElement('tr');
                 tt.appendChild(tr);
-                ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(function(val, idx, arr) {
+                ['Week of ' + dt, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(function(val, idx, arr) {
                     let th = document.createElement('th');
-                    th.id = 'th_' + idx.toString();
                     th.innerText = val;
                     tr.appendChild(th);
                 })
                 for (let hour = 8; hour < 22; hour++) {
                     let tr = document.createElement('tr');
-                    tr.id = 'tm_' + hour.toString();
+                    tr.id = 'tm_' + ttidx.toString() + '_' + hour.toString();
                     tt.appendChild(tr);
                     for (let day = 0; day < 6; day++) {
                         let td = document.createElement('td');
-                        td.id = 'tt_d' + day.toString() + '_tm' + hour.toString();
+                        td.id = 'tt_' + ttidx.toString() + '_d' + day.toString() + '_tm' + hour.toString();
                         if (day == 0) {
                             td.innerText = hour.toString() + 'u';
                         }
                         tr.appendChild(td);
                     }
                 }
+
+                let ltcd = document.createElement('div');
+                ltcd.id = 'loadedTablesContainer' + ttidx.toString();
+                ltcd.hidden = true;
+                ttd.appendChild(ltcd);
+
+                let ltct = document.createElement('table');
+                ltcd.appendChild(ltct);
+                let ltcb = document.createElement('tbody');
+                ltcb.id = 'loadedTables' + ttidx.toString();
+                ltct.appendChild(ltcb);
+
+                let tsel = document.createElement('select');
+                tsel.className = 'selectTeacher';
+                populateTeacherSelect(tsel);
+                ttd.append(tsel);
+
+                let symsel = document.createElement('select');
+                symsel.className = 'selectSymbol';
+                ttd.append(symsel);
+                loadSymbols(ttidx);
+
+                let loadbtn = document.createElement('button');
+                loadbtn.innerText = 'Load Timetable';
+                loadbtn.onclick = _mkBtnHandler(ttidx);
+                ttd.append(loadbtn);
             }
-            createTimetable();
+            function _mkBtnHandler(tbl) {
+                return function() { on_tt_button(tbl); }
+            }
 
-            // List of loaded timetables
-            //let timetables = {};
-
-            function addLoadedTable(tbldata, name) {
-                let table = document.getElementById('loadedTables');
+            function addLoadedTable(tbl, symbol, name) {
+                let table = document.querySelector('#loadedTablesContainer' + tbl.toString() + ' tbody');
                 let tr = document.createElement('tr');
-                [tbldata.symbol, name].forEach(function(val) {
+                [symbol, name].forEach(function(val) {
                     let td = document.createElement('td');
                     td.innerText = val;
                     tr.appendChild(td);
                 });
-                tr.dataset.objid = tbldata.objid;
+                //tr.dataset.objid = tbldata.objid;
                 table.appendChild(tr);
-                document.getElementById('loadedTablesContainer').hidden = false;
+                let ct = document.querySelector('#loadedTablesContainer' + tbl.toString());
+                ct.hidden = false;
             }
 
-            // Add one element to the timetable
-            function addTtEl(val, idx, ttable) {
-                let cell_id = 'tt_d' + val.day.toString() + '_tm' + val.time.toString();
+            /* Add one element to the timetable
+              tbl = table index in timetables, ttable = info for this time table
+              val = one table entry
+            */
+            function addTtEl(tbl, ttable, val) {
+                let cell_id = 'tt_' + tbl.toString() + '_d' + val.day.toString() + '_tm' + val.time.toString();
                 let cell = document.getElementById(cell_id);
                 let content = document.createElement('span');
                 let el_class = ttable.tbltype + '_' + ttable.objid;
@@ -326,23 +370,26 @@
 
             let x; // for debug
             // callback function for the Load Timetable button
-            function loadTimetable(tt, name) {
-                x = tt; // for debug
-                tbl = {
-                    'tbltype': tt.tbltype,
-                    'objid': tt.objid,
-                    'symbol': selectSymbol()
+            function loadTimetable(tbl, queryRes, name, symbol) {
+                x = queryRes; // for debug
+                qInfo = {
+                    'tbltype': queryRes.tbltype,
+                    'objid': queryRes.objid,
+                    'symbol': symbol
                 };
-                //timetables[tt.tbltype + '_' + tt.objid] = tbl;
-                addLoadedTable(tbl, name);
-                tt.table.forEach(function(val, idx, arr) { addTtEl(val, idx, tbl); });
+                //timetables[tt.tbltype + '_' + tt.objid] = tbl; // → change to adding correct info
+                queryRes.table.forEach(function(val, idx, arr) { addTtEl(tbl, qInfo, val); });
             }
 
-            function on_tt_button() {
-                let ttdate = document.getElementById('ttdate').value;
-                let ttteacher = document.getElementById('ttteacher').value;
+            function on_tt_button(tbl) {
+                let ttdate = timetables[tbl].date;
+                let ttteacher = document.querySelector('#tmtblct' + tbl + ' .selectTeacher').value;
+                let symbol = selectSymbol(tbl);
                 pywebview.api.getTimeTable('teacher', ttteacher, ttdate).then(
-                    function(res) { loadTimetable(res, teachers[ttteacher].name); }
+                    function(res) {
+                        loadTimetable(tbl, res, teachers[ttteacher].name, symbol);
+                        addLoadedTable(tbl, symbol, teachers[ttteacher].name);
+                    }
                 );
             }
         </script>
