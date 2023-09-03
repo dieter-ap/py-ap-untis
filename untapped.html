@@ -23,6 +23,7 @@
         </style>
     </head>
     <body>
+        <datalist id="subjectList"></datalist>
         <div id="loginshizzle">
             <div>
                 <label for="username">Username:</label>
@@ -102,6 +103,7 @@
                             pywebview.api.loadSchoolyears().then(loadSchoolyears);
                             document.getElementById('toggleSettings').disabled = false;
                             document.getElementById('toggleSettings').hidden = false;
+                            pywebview.api.getSubjects().then(loadSubjects);
                             pywebview.api.loadTeachers().then(loadTeachers);
                             document.getElementById('addContainer').hidden = false;
                         } else {
@@ -123,6 +125,18 @@
                         document.getElementById('ttloadbtn').disabled = true;
                     }
                 );
+            }
+
+            let data = {};
+            function loadSubjects(res) {
+                data.Subjects = res;
+                let dl = document.getElementById('subjectList');
+                res.forEach(function(val) {
+                    let opt = document.createElement('option');
+                    opt.value = val.name;
+                    opt.innerText = val.longName;
+                    dl.appendChild(opt);
+                });
             }
 
             function teacherLookup() {
@@ -311,10 +325,24 @@
                 ltcb.id = 'loadedTables' + ttidx.toString();
                 ltct.appendChild(ltcb);
 
-                let tsel = document.createElement('select');
-                tsel.className = 'selectTeacher';
-                populateTeacherSelect(tsel);
-                ttd.append(tsel);
+                let typesel = document.createElement('select');
+                typesel.className = 'selectType';
+                ['Subject', 'Teacher'].forEach(function(label) {
+                    let opt = document.createElement('option');
+                    opt.innerText = label;
+                    typesel.appendChild(opt);
+                })
+                ttd.append(typesel);
+
+                let tchsel = document.createElement('select');
+                tchsel.className = 'selectTeacher';
+                populateTeacherSelect(tchsel);
+                ttd.append(tchsel);
+
+                let subsel = document.createElement('input');
+                subsel.className = 'selectSubject';
+                subsel.setAttribute('list', 'subjectList');
+                ttd.append(subsel);
 
                 let symsel = document.createElement('select');
                 symsel.className = 'selectSymbol';
@@ -357,7 +385,8 @@
                 content.innerText = ttable.symbol;
                 let title = [];
                 if (val.teachers.length) {
-                    title.push('T: ' + teachers[val.teachers[0].id].name);
+                    let tid = val.teachers[0].id;
+                    title.push('T: ' + (tid in teachers ? teachers[tid].name : tid.toString()));
                 }
                 if (val.subjects.length) {
                     title.push('S: ' + val.subjects[0].long_name);
@@ -387,14 +416,32 @@
 
             function on_tt_button(tbl) {
                 let ttdate = timetables[tbl].date;
-                let ttteacher = document.querySelector('#tmtblct' + tbl + ' .selectTeacher').value;
+                let tblct = document.getElementById('tmtblct' + tbl.toString());
+                let tttype = tblct.querySelector('.selectType').value;
                 let symbol = selectSymbol(tbl);
+                if (tttype == 'Teacher') {
+                    let ttteacher = document.querySelector('#tmtblct' + tbl + ' .selectTeacher').value;
                 pywebview.api.getTimeTable('teacher', ttteacher, ttdate).then(
                     function(res) {
                         loadTimetable(tbl, res, teachers[ttteacher].name, symbol);
                         addLoadedTable(tbl, symbol, teachers[ttteacher].name);
                     }
                 );
+                } else {
+                    let val = tblct.querySelector('.select' + tttype).value;
+                    let dataList = data[tttype + 's'];
+                    let vdata = dataList.find(function(el) { return el.name == val; });
+                    if (!vdata) {
+                        alert(ttype + ' was not found');
+                        return;
+                    }
+                    pywebview.api.getTimeTable(tttype.toLowerCase(), vdata.id, ttdate).then(
+                        function(res) {
+                            loadTimetable(tbl, res, vdata.longName, symbol);
+                            addLoadedTable(tbl, symbol, vdata.longName);
+                        }
+                    )
+                }
             }
         </script>
     </body>

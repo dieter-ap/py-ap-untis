@@ -104,6 +104,12 @@ def findTeacher(firstName, lastName, remember=True):
             setConfig('teachers', teachers)
         return ret
 
+def getSubjects():
+    subjects = list(py_ap_untis.get_subjects().values())
+    return [
+        {'id': s.id, 'name': s.name, 'longName': s.long_name} for s in subjects
+    ]
+
 def getTimeTable(tbltype, id, tbldate):
     '''
     Return the timetable for the given teacher (numeric id) and the tbldate
@@ -134,5 +140,5 @@ def getTimeTable(tbltype, id, tbldate):
 
 ui = webview.create_window('Untapped', url='./untapped.html')
 ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
-          getDateFormats, loadTeachers, findTeacher, getTimeTable)
+          getDateFormats, getSubjects, loadTeachers, findTeacher, getTimeTable)
 webview.start(debug=True)
