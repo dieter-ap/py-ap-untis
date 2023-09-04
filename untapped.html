@@ -116,7 +116,7 @@
                             pywebview.api.loadSchoolyears().then(loadSchoolyears);
                             document.getElementById('toggleSettings').disabled = false;
                             document.getElementById('toggleSettings').hidden = false;
-                            pywebview.api.getSubjects().then(loadSubjects);
+                            pywebview.api.getSubjects().then(function(res) { loadData('subject', res); });
                             //pywebview.api.getGroups().then(loadGroups); automatically when schoolyears are loaded
                             pywebview.api.loadTeachers().then(loadTeachers);
                             document.getElementById('addContainer').hidden = false;
@@ -142,19 +142,9 @@
             }
 
             let data = {};
-            function loadSubjects(res) {
-                data.Subjects = res;
-                let dl = document.getElementById('subjectList');
-                res.forEach(function(val) {
-                    let opt = document.createElement('option');
-                    opt.value = val.name;
-                    opt.innerText = val.longName;
-                    dl.appendChild(opt);
-                });
-            }
-            function loadGroups(res) { // xxx refactor forEach to function (see subjects)
-                data.Groups = res;
-                let dl = document.getElementById('groupList');
+            function loadData(dtype, res) {
+                data[dtype + 's'] = res;
+                let dl = document.getElementById(dtype + 'List');
                 res.forEach(function(val) {
                     let opt = document.createElement('option');
                     opt.value = val.name;
@@ -208,7 +198,7 @@
             
             function fetchGroups() {
                 let sy = document.getElementById('schoolyears').value;
-                pywebview.api.getGroups(sy).then(loadGroups);
+                pywebview.api.getGroups(sy).then(function(res) { loadData('group', res); });
             }
 
             let teachers;
@@ -487,7 +477,7 @@
                 );
                 } else {
                     let val = tblct.querySelector('.select' + tttype).value;
-                    let dataList = data[tttype + 's'];
+                    let dataList = data[tttype.toLowerCase() + 's'];
                     let vdata = dataList.find(function(el) { return el.name == val; });
                     if (!vdata) {
                         alert(ttype + ' was not found');
