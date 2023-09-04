@@ -133,11 +133,11 @@ def search_teacher(surname, forename, try_reversed=True):
         _teachers[t.id] = t
         return t
 
-def get_groups(department=None, reset=False):
+def get_groups(department=None, schoolyear=None, reset=False):
     global _groups
     if reset or _groups is None:
         _assert_session()
-        _groups = {k.id: k for k in _session.klassen()}
+        _groups = {k.id: k for k in _session.klassen(schoolyear=schoolyear)}
 
     if department is not None:
         return {
@@ -146,8 +146,8 @@ def get_groups(department=None, reset=False):
             }
     return _groups
 
-def find_groups(pattern='', department=None):
-    groups = get_groups(department).values()
+def find_groups(pattern='', department=None, schoolyear=None):
+    groups = get_groups(department=department, schoolyear=schoolyear).values()
     return [g for g in groups if fnmatch(g.name, pattern)]
 
 def write_timetable_csv(outfile, tt_data):
