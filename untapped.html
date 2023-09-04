@@ -77,7 +77,6 @@
             <button onclick="addTimetable()">New Timetable</button>
         </div>
 
-
         <script>
             window.addEventListener('pywebviewready', function() {
                 pywebview.api.getConfig('untisUser').then(function(val) {
@@ -393,8 +392,8 @@
                     cell.appendChild(lesson_ct);
                 }
                 let content = document.createElement('span');
-                let el_class = ttable.tbltype + '_' + ttable.objid;
-                content.className = el_class;
+                //let el_class = ttable.tbltype + '_' + ttable.objid;
+                //content.className = el_class;
                 content.innerText = ttable.symbol;
                 let title = [];
                 if (val.teachers.length) {
@@ -423,7 +422,6 @@
                     'objid': queryRes.objid,
                     'symbol': symbol
                 };
-                //timetables[tt.tbltype + '_' + tt.objid] = tbl; // → change to adding correct info
                 queryRes.table.forEach(function(val, idx, arr) { addTtEl(tbl, qInfo, val); });
             }
 
