@@ -17,6 +17,11 @@
             .timetable td, .timetable th {
                 border: solid 1px;
             }
+            span.symbolGroup {
+                border: solid 1px darkgray;
+                border-radius: 5px;
+                padding: 2px;
+            }
             #teacherLookup {
                 border: darkred solid 1px;
             }
@@ -379,6 +384,14 @@
             function addTtEl(tbl, ttable, val) {
                 let cell_id = 'tt_' + tbl.toString() + '_d' + val.day.toString() + '_tm' + val.time.toString();
                 let cell = document.getElementById(cell_id);
+                let lesson_ct = cell.querySelector('span[data-lessonid="' + val.id.toString() + '"]');
+                if (lesson_ct) {
+                    lesson_ct.classList.add('symbolGroup');
+                } else {
+                    lesson_ct = document.createElement('span');
+                    lesson_ct.dataset.lessonid = val.id;
+                    cell.appendChild(lesson_ct);
+                }
                 let content = document.createElement('span');
                 let el_class = ttable.tbltype + '_' + ttable.objid;
                 content.className = el_class;
@@ -398,7 +411,7 @@
                     title.push('R: ' + val.rooms[0].name);
                 }
                 content.title = title.join(', ');
-                cell.appendChild(content);
+                lesson_ct.appendChild(content);
             }
 
             let x; // for debug
