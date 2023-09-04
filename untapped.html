@@ -37,6 +37,7 @@
     </head>
     <body>
         <datalist id="subjectList"></datalist>
+        <datalist id="groupList"></datalist>
         <div id="loginshizzle">
             <div>
                 <label for="username">Username:</label>
@@ -55,7 +56,7 @@
         <div id="settings" hidden="true">
             <div>
                 <label for="schoolyears">Schoolyear:</label>
-                <select name="schoolyears" id="schoolyears" onchange="setTtLimits()"></select>
+                <select name="schoolyears" id="schoolyears" onchange="setTtLimits(); fetchGroups()"></select>
             </div>
             <div id="teacherLookup">
                 Add a teacher.
@@ -116,6 +117,7 @@
                             document.getElementById('toggleSettings').disabled = false;
                             document.getElementById('toggleSettings').hidden = false;
                             pywebview.api.getSubjects().then(loadSubjects);
+                            //pywebview.api.getGroups().then(loadGroups); automatically when schoolyears are loaded
                             pywebview.api.loadTeachers().then(loadTeachers);
                             document.getElementById('addContainer').hidden = false;
                         } else {
@@ -143,6 +145,16 @@
             function loadSubjects(res) {
                 data.Subjects = res;
                 let dl = document.getElementById('subjectList');
+                res.forEach(function(val) {
+                    let opt = document.createElement('option');
+                    opt.value = val.name;
+                    opt.innerText = val.longName;
+                    dl.appendChild(opt);
+                });
+            }
+            function loadGroups(res) { // xxx refactor forEach to function (see subjects)
+                data.Groups = res;
+                let dl = document.getElementById('groupList');
                 res.forEach(function(val) {
                     let opt = document.createElement('option');
                     opt.value = val.name;
@@ -183,7 +195,7 @@
                 combo.onchange();
             }
 
-            // callback function for schoolyears dropdown value change
+            // callback functions for schoolyears dropdown value change
             function setTtLimits() {
                 let scyearsel = document.getElementById('schoolyears');
                 let yearattrs = schoolyears[scyearsel.value];
@@ -192,6 +204,11 @@
                     ttdatesel.min = yearattrs['start'];
                     ttdatesel.max = yearattrs['end'];
                 }
+            }
+            
+            function fetchGroups() {
+                let sy = document.getElementById('schoolyears').value;
+                pywebview.api.getGroups(sy).then(loadGroups);
             }
 
             let teachers;
@@ -339,7 +356,7 @@
 
                 let typesel = document.createElement('select');
                 typesel.className = 'selectType';
-                ['Subject', 'Teacher'].forEach(function(label) {
+                ['Subject', 'Group', 'Teacher'].forEach(function(label) {
                     let opt = document.createElement('option');
                     opt.innerText = label;
                     typesel.appendChild(opt);
@@ -356,6 +373,11 @@
                 subsel.className = 'selectSubject';
                 subsel.setAttribute('list', 'subjectList');
                 ttd.append(subsel);
+
+                let grpsel = document.createElement('input');
+                grpsel.className = 'selectGroup';
+                grpsel.setAttribute('list', 'groupList');
+                ttd.append(grpsel);
 
                 let symsel = document.createElement('select');
                 symsel.className = 'selectSymbol';

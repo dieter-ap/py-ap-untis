@@ -110,12 +110,20 @@ def getSubjects():
         {'id': s.id, 'name': s.name, 'longName': s.long_name} for s in subjects
     ]
 
+def getGroups(schoolyear):
+    groups = list(py_ap_untis.get_groups(schoolyear=schoolyear, reset=True).values())
+    return [
+        {'id': s.id, 'name': s.name, 'longName': s.long_name} for s in groups
+    ]
+
 def getTimeTable(tbltype, id, tbldate):
     '''
     Return the timetable for the given teacher (numeric id) and the tbldate
     which needs to be in isoformat.
     '''
     global untis_session
+    if tbltype == 'group':
+        tbltype = 'klasse' # meh
     day1 = datetime.date.fromisoformat(tbldate)
     day1 -= datetime.timedelta(days=day1.weekday())
     tt = untis_session.timetable(start=day1,
@@ -140,5 +148,6 @@ def getTimeTable(tbltype, id, tbldate):
 
 ui = webview.create_window('Untapped', url='./untapped.html')
 ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
-          getDateFormats, getSubjects, loadTeachers, findTeacher, getTimeTable)
+          getDateFormats, getSubjects, getGroups, loadTeachers, findTeacher,
+          getTimeTable)
 webview.start(debug=True)
