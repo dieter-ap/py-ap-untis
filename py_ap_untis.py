@@ -162,3 +162,6 @@ def write_timetable_csv(outfile, tt_data):
                          '|'.join(g.name for g in el.klassen),
                          '|'.join(teachers),
                          ])
+
+if __name__ == '__main__':
+    s = get_session()
