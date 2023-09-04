@@ -339,6 +339,7 @@
                     opt.innerText = label;
                     typesel.appendChild(opt);
                 })
+                typesel.onchange = _mkTypeSelHandler(ttidx);
                 ttd.append(typesel);
 
                 let tchsel = document.createElement('select');
@@ -356,10 +357,26 @@
                 ttd.append(symsel);
                 loadSymbols(ttidx);
 
+                typesel.onchange();
+
                 let loadbtn = document.createElement('button');
                 loadbtn.innerText = 'Load Timetable';
                 loadbtn.onclick = _mkBtnHandler(ttidx);
                 ttd.append(loadbtn);
+            }
+            function _mkTypeSelHandler(tbl) {
+                // Create a function that will be called when a table type
+                // is changed.
+                let tablect = document.getElementById('tmtblct' + tbl.toString());
+                return function(event) {
+                    let typeSel = tablect.querySelector('select.selectType');
+                    typeSel.querySelectorAll('option').forEach(function(opt) {
+                        let optSel = tablect.querySelector('.select' + opt.value);
+                        if (optSel) {
+                            optSel.hidden = typeSel.value != opt.value;
+                        }
+                    })
+                }
             }
             function _mkBtnHandler(tbl) {
                 return function() { on_tt_button(tbl); }
