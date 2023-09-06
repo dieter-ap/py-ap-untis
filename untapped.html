@@ -239,7 +239,7 @@
                 let unused = combo;
                 let used;
                 let symbols = timetables[tbl].symbols;
-                if (symbols.used.circles.length + symbols.used.squares.length > 0) {
+                if (symbols.find(function(el) { return el.used; })) {
                     if (unused = combo.querySelector('optgroup[label="Unused"]')) {
                         used = document.querySelector('optgroup[label="Used"]');
                     } else {
@@ -251,35 +251,25 @@
                         combo.add(used);
                     }
                 }
-                symbols.unused.circles.forEach(function(val) { _loadSymbol(unused, val, 'unused', 'circles'); });
-                symbols.unused.squares.forEach(function(val) { _loadSymbol(unused, val, 'unused', 'squares'); });
-                symbols.used.circles.forEach(function(val) { _loadSymbol(used, val, 'used', 'circles'); });
-                symbols.used.squares.forEach(function(val) { _loadSymbol(used, val, 'used', 'squares'); });
+                symbols.forEach(function(sym) {
+                    let opt = document.createElement('option');
+                    opt.innerText = sym.symbol;
+                    if (sym.used) {
+                        used.appendChild(opt);
+                    } else {
+                        unused.appendChild(opt);
             }
-            function _loadSymbol(container, val, used, collection) {
-                let opt = document.createElement('option');
-                opt.value = val;
-                opt.text = val;
-                opt.dataset.used = used;
-                opt.dataset.collection = collection;
-                container.appendChild(opt);
+                });
             }
 
-            // Return the selected symbol and move it to the right 'used' list
-            // if previously unused.
+            // Return the selected symbol and set its status to used
             function selectSymbol(tbl) {
                 let symbols = timetables[tbl].symbols;
                 let combo = document.querySelector('#tmtblct' + tbl.toString() + ' .selectSymbol');
-                let selected = combo.options[combo.selectedIndex];
-                if (selected.dataset.used == 'unused') {
-                    let coll = selected.dataset.collection;
-                    let symlist = symbols['unused'][coll];
-                    let idx = symlist.findIndex(function(v) { return v == combo.value; })
-                    symbols['used'][coll] = symbols['used'][coll].concat(symlist.splice(idx, 1));
-                }
-                let val = combo.value;
+                let sym = symbols.find(function (s) { return s.symbol == combo.value; });
+                sym.used = true;
                 loadSymbols(tbl);
-                return val;
+                return sym.symbol;
             }
 
             function addTimetable() {
@@ -287,16 +277,11 @@
                 let dt = document.getElementById('ttdate').value;
                 timetables[ttidx] = {
                     'date': dt,
-                    'symbols': {
-                        'unused': {
-                            'circles': ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫'],
-                            'squares': ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛']
-                        },
-                        'used': {
-                            'circles': [],
-                            'squares': []
-                        }
-                    }
+                    'symbols': [
+                        '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫',
+                        '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛',
+                        '❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🤎'
+                    ].map(function(s) { return {'symbol': s, 'used': false}; })
                 }
                 var el_tables = document.getElementById('timetables');
                 let ttd = document.createElement('div');
