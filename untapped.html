@@ -30,6 +30,10 @@
             input, select {
                 margin: 5px 10px 0px 0px;
             }
+            .closebutton {
+                font-size: x-large;
+                float: right;
+            }
             #teacherLookup {
                 border: darkred solid 1px;
             }
@@ -365,6 +369,13 @@
                 loadbtn.innerText = 'Load Timetable';
                 loadbtn.onclick = _mkBtnHandler(ttidx);
                 ttd.append(loadbtn);
+
+                let closebtn = document.createElement('span');
+                closebtn.innerText = '☒';
+                closebtn.className = 'closebutton';
+                closebtn.title = 'Remove this timetable';
+                closebtn.onclick = _mkCloseHandler(ttidx);
+                ttd.append(closebtn);
             }
             function _mkTypeSelHandler(tbl) {
                 // Create a function that will be called when a table type
@@ -382,6 +393,15 @@
             }
             function _mkBtnHandler(tbl) {
                 return function() { on_tt_button(tbl); }
+            }
+            function _mkCloseHandler(tbl) {
+                return function() {
+                    if (confirm('Are you sure you want to remove this table?')) {
+                        let tblel = document.getElementById('tmtblct' + tbl.toString());
+                        tblel.parentElement.removeChild(tblel);
+                        delete timetables[tbl];
+                    }
+                }
             }
 
             function addLoadedTable(tbl, symbol, name) {
