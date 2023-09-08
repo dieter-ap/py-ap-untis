@@ -94,18 +94,32 @@ def getDateFormats(datestr, wfmt, dfmt):
 def loadTeachers():
     return getConfig('teachers', {})
 
-def findTeacher(firstName, lastName, remember=True):
-    if firstName == "Reset" and lastName == "Reset": # might be tmp, might stay
-        setConfig('teachers', {})
-        return
-    res = py_ap_untis.search_teacher(lastName, firstName, False)
+def findTeacher(name):
+    '''
+    Try to find a teacher with the given name, which we'll have to split to
+    have a first name and last name. The user can make it easier by putting a
+    comma between first and last name (when first name exists of more than one
+    word). If a teacher is found, it is automaticaly stored in the config.
+    XXX The full name is assumed to be unique and also: stored results are case
+        sensitive so might contain doubles.
+    '''
+    if ',' in name:
+        first, last = name.split(',', 1)
+        res = py_ap_untis.search_teacher(last, first, False)
+    else:
+        words = name.split()
+        for n in range(1, len(words)):
+            first, last = words[:n], words[n:]
+            res = py_ap_untis.search_teacher(' '.join(last), ' '.join(first), False)
+            if res:
+                break
     if res:
         ret = {'id': res.id, 'name': res.full_name, 'longName': res.full_name,
                'forename': res.fore_name, 'surname': res.surname}
-        if remember:
-            teachers = getConfig('teachers', {})
-            teachers[res.id] = ret
-            setConfig('teachers', teachers)
+        teachers = getConfig('teachers', [])
+        teachersMap = {el['longName']: el for el in teachers}
+        teachersMap[res.full_name] = ret
+        setConfig('teachers', [v for v in teachersMap.values()])
         return ret
 
 def getSubjects():
@@ -119,6 +133,15 @@ def getGroups(schoolyear):
     return [
         {'id': s.id, 'name': s.name, 'longName': s.long_name} for s in groups
     ]
+
+def getTeacherData(id_data):
+    '''
+    Return dictionary with teacher information from an id (because no right to
+    query). id_data is a list of dicts containing an 'id' key. If we have no
+    data about this teacher, use the id as 'name'.
+    '''
+    teacherMap = {el['id']: el for el in getConfig('teachers', [])}
+    return [teacherMap.get(ti['id'], dict(ti, name=ti['id'])) for ti in id_data]
 
 def getTimeTable(tbltype, id, tbldate):
     '''
@@ -140,7 +163,7 @@ def getTimeTable(tbltype, id, tbldate):
         'groups': [{'id': k.id, 'name': k.name, 'long_name': k.long_name} for k in e.klassen],
         'rooms': [{'id': r.id, 'name': r.name, 'long_name': r.long_name} for r in e.rooms],
         'subjects': [{'id': s.id, 'name': s.name, 'long_name': s.long_name} for s in e.subjects],
-        'teachers': e._data['te'],
+        'teachers': getTeacherData(e._data['te']),
         'time': e.start.hour
     } for e in tt]
     return {

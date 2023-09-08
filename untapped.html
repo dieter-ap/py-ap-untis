@@ -34,14 +34,12 @@
                 font-size: x-large;
                 float: right;
             }
-            #teacherLookup {
-                border: darkred solid 1px;
-            }
         </style>
     </head>
     <body>
         <datalist id="subjectList"></datalist>
         <datalist id="groupList"></datalist>
+        <datalist id="teacherList"></datalist>
         <div id="loginshizzle">
             <div>
                 <label for="username">Username:</label>
@@ -62,23 +60,6 @@
                 <label for="schoolyears">Schoolyear:</label>
                 <select name="schoolyears" id="schoolyears" onchange="setTtLimits(); fetchGroups()"></select>
             </div>
-            <div id="teacherLookup">
-                Add a teacher.
-                <div>
-                    <label for="tlFirstName">First Name:</label>
-                    <input id="tlFirstName" name="tlFirstName"> 
-                </div>
-                <div>
-                    <label for="tlLastName">Last Name:</label>
-                    <input id="tlLastName" name="tlLastName"> 
-                </div>
-                <div>
-                    <label for="tlRemember">Remember:</label>
-                    <input type="checkbox" name="tlRemember" id="tlRemember" checked="true">
-                    <button onclick="teacherLookup()">Search</button>
-                    <span id="tlMessage"></span>
-                </div>
-            </div>
             <div>
                 <button onclick="untislogout()">Logout</button>
             </div>
@@ -94,6 +75,9 @@
             window.addEventListener('pywebviewready', function() {
                 pywebview.api.getConfig('untisUser').then(function(val) {
                     document.getElementById('untisuser').value = val;
+                })
+                pywebview.api.loadTeachers().then(function(res) {
+                    loadData('teacher', res);
                 })
             })
 
@@ -122,7 +106,6 @@
                             document.getElementById('toggleSettings').hidden = false;
                             pywebview.api.getSubjects().then(function(res) { loadData('subject', res); });
                             //pywebview.api.getGroups().then(loadGroups); automatically when schoolyears are loaded
-                            pywebview.api.loadTeachers().then(loadTeachers);
                             document.getElementById('addContainer').hidden = false;
                         } else {
                             document.getElementById('loginmessage').innerText = 'Login failed';
@@ -152,28 +135,10 @@
                 newData.forEach(function(val) {
                     let opt = document.createElement('option');
                     if (val.name != val.longName) {
-                    opt.value = val.name;
+                        opt.value = val.name;
                     }
                     opt.innerText = val.longName;
                     dl.appendChild(opt);
-                });
-            }
-
-            function teacherLookup() {
-                let firstName = document.getElementById('tlFirstName').value;
-                let lastName = document.getElementById('tlLastName').value;
-                let remember = document.getElementById('tlRemember').checked;
-                pywebview.api.findTeacher(firstName, lastName, remember).then(function(res) {
-                    let msgField = document.getElementById('tlMessage');
-                    if (res) {
-                        teachers[res.id] = res;
-                        loadTeachers(teachers);
-                        msgField.innerText = 'Teacher ' + res.name + ' was added';
-                        document.getElementById('tlFirstName').value = '';
-                        document.getElementById('tlLastName').value = '';
-                    } else {
-                        msgField.innerText = 'This teacher could not be found';
-                    }
                 });
             }
 
@@ -207,32 +172,6 @@
                 pywebview.api.getGroups(sy).then(function(res) { loadData('group', res); });
             }
 
-            let teachers;
-
-            /* The following function is used to add all teachers to one combo
-                box. It is called by loadTeachers, and also when a new combo is
-                added. This could probably be improved (made more efficient). */
-            function populateTeacherSelect(combo) {
-                while (combo.length > 0) {
-                    combo.remove(combo.length - 1);
-                }
-                let keys = Object.keys(teachers);
-                keys.sort(function(a, b) {
-                    return teachers[a].name > teachers[b].name ? 1 : -1;
-                });
-                keys.forEach(function(val, idx, arr) {
-                    let o = document.createElement('option');
-                    o.value = val;
-                    o.text = teachers[val]['name'];
-                    combo.add(o);
-                });
-            }
-
-            function loadTeachers(res) {
-                teachers = res; // assign to global
-                document.querySelectorAll(".selectTeacher").forEach(populateTeacherSelect);
-            }
-
             let timetables = {}; // all the existing tables
             let ttidx = 0; // last used table index
 
@@ -264,7 +203,7 @@
                         used.appendChild(opt);
                     } else {
                         unused.appendChild(opt);
-            }
+                    }
                 });
             }
 
@@ -304,9 +243,9 @@
                 pywebview.api.getDateFormats(dt, '%b', '%a %d').then(function(res) {
                     res.forEach(function(val, idx, arr) {
                         if (idx < 6) {
-                    let th = document.createElement('th');
-                    th.innerText = val;
-                    tr.appendChild(th);
+                            let th = document.createElement('th');
+                            th.innerText = val;
+                            tr.appendChild(th);
                         }
                     });
                 });
@@ -345,9 +284,9 @@
                 typesel.onchange = _mkTypeSelHandler(ttidx);
                 ttd.append(typesel);
 
-                let tchsel = document.createElement('select');
+                let tchsel = document.createElement('input');
                 tchsel.className = 'selectTeacher';
-                populateTeacherSelect(tchsel);
+                tchsel.setAttribute('list', 'teacherList');
                 ttd.append(tchsel);
 
                 let subsel = document.createElement('input');
@@ -442,7 +381,7 @@
                 let title = [];
                 if (val.teachers.length) {
                     let tid = val.teachers[0].id;
-                    title.push('T: ' + (tid in teachers ? teachers[tid].name : tid.toString()));
+                    title.push('T: ' + val.teachers[0].name);
                 }
                 if (val.subjects.length) {
                     title.push('S: ' + val.subjects[0].long_name);
@@ -459,7 +398,7 @@
 
             let x; // for debug
             // callback function for the Load Timetable button
-            function loadTimetable(tbl, queryRes, name, symbol) {
+            function loadTimetable(tbl, queryRes, symbol) {
                 x = queryRes; // for debug
                 qInfo = {
                     'tbltype': queryRes.tbltype,
@@ -473,30 +412,34 @@
                 let ttdate = timetables[tbl].date;
                 let tblct = document.getElementById('tmtblct' + tbl.toString());
                 let tttype = tblct.querySelector('.selectType').value;
-                let symbol = selectSymbol(tbl);
-                if (tttype == 'Teacher') {
-                    let ttteacher = document.querySelector('#tmtblct' + tbl + ' .selectTeacher').value;
-                pywebview.api.getTimeTable('teacher', ttteacher, ttdate).then(
-                    function(res) {
-                        loadTimetable(tbl, res, teachers[ttteacher].name, symbol);
-                        addLoadedTable(tbl, symbol, teachers[ttteacher].name);
-                    }
-                );
-                } else {
-                    let val = tblct.querySelector('.select' + tttype).value;
-                    let dataList = data[tttype.toLowerCase() + 's'];
-                    let vdata = dataList.find(function(el) { return el.name == val; });
-                    if (!vdata) {
-                        alert(tttype + ' ' + val + ' was not found');
-                        return;
-                    }
-                    pywebview.api.getTimeTable(tttype.toLowerCase(), vdata.id, ttdate).then(
-                        function(res) {
-                            loadTimetable(tbl, res, vdata.longName, symbol);
-                            addLoadedTable(tbl, symbol, vdata.longName);
+                let val = tblct.querySelector('.select' + tttype).value;
+                let dataList = data[tttype.toLowerCase() + 's'];
+                let vdata = dataList.find(function(el) { return el.name == val; });
+                if (tttype == 'Teacher' && !vdata) {
+                    pywebview.api.findTeacher(val).then(function (res) {
+                        if (res) {
+                            dataList.push(res);
+                            vdata = res;
                         }
-                    )
+                        getTimeTable(tbl, tttype.toLowerCase(), val, vdata, ttdate);
+                    })
+                } else {
+                    getTimeTable(tbl, tttype.toLowerCase(), val, vdata, ttdate);
                 }
+            }
+
+            function getTimeTable(tbl, type, value, queryData, date) {
+                if (!queryData) {
+                    alert(type + ' ' + value + ' was not found');
+                    return;
+                }
+                let symbol = selectSymbol(tbl);
+                pywebview.api.getTimeTable(type.toLowerCase(), queryData.id, date).then(
+                    function(res) {
+                        loadTimetable(tbl, res, symbol);
+                        addLoadedTable(tbl, symbol, queryData.longName);
+                    }
+                )
             }
         </script>
     </body>
