@@ -97,7 +97,8 @@ def loadTeachers():
 def findTeacher(firstName, lastName, remember=True):
     res = py_ap_untis.search_teacher(lastName, firstName, False)
     if res:
-        ret = {'id': res.id, 'name': res.full_name}
+        ret = {'id': res.id, 'name': res.full_name, 'longName': res.full_name,
+               'forename': res.fore_name, 'surname': res.surname}
         if remember:
             teachers = getConfig('teachers', {})
             teachers[res.id] = ret
