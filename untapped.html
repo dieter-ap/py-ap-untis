@@ -485,7 +485,7 @@
                     let dataList = data[tttype.toLowerCase() + 's'];
                     let vdata = dataList.find(function(el) { return el.name == val; });
                     if (!vdata) {
-                        alert(ttype + ' was not found');
+                        alert(tttype + ' ' + val + ' was not found');
                         return;
                     }
                     pywebview.api.getTimeTable(tttype.toLowerCase(), vdata.id, ttdate).then(
