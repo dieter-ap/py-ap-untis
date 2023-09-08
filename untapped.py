@@ -119,7 +119,8 @@ def findTeacher(name):
         teachers = getConfig('teachers', [])
         teachersMap = {el['longName']: el for el in teachers}
         teachersMap[res.full_name] = ret
-        setConfig('teachers', [v for v in teachersMap.values()])
+        teachers = [v for v in teachersMap.values()]
+        setConfig('teachers', sorted(teachers, key=lambda e: e['longName']))
         return ret
 
 def getSubjects():
