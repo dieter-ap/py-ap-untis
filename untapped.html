@@ -146,10 +146,10 @@
             }
 
             let data = {};
-            function loadData(dtype, data) {
-                data[dtype + 's'] = data;
+            function loadData(dtype, newData) {
+                data[dtype + 's'] = newData;
                 let dl = document.getElementById(dtype + 'List');
-                data.forEach(function(val) {
+                newData.forEach(function(val) {
                     let opt = document.createElement('option');
                     if (val.name != val.longName) {
                     opt.value = val.name;
