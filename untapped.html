@@ -132,6 +132,7 @@
             function loadData(dtype, newData) {
                 data[dtype + 's'] = newData;
                 let dl = document.getElementById(dtype + 'List');
+                dl.querySelectorAll('option').forEach(function(c) { dl.removeChild(c) })
                 newData.forEach(function(val) {
                     let opt = document.createElement('option');
                     if (val.name != val.longName) {
@@ -419,6 +420,8 @@
                     pywebview.api.findTeacher(val).then(function (res) {
                         if (res) {
                             dataList.push(res);
+                            dataList.sort(function(a, b) { return a.name < b.name ? -1 : 1; })
+                            loadData('teacher', dataList);
                             vdata = res;
                         }
                         getTimeTable(tbl, tttype.toLowerCase(), val, vdata, ttdate);
