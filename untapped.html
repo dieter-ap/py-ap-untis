@@ -151,7 +151,9 @@
                 let dl = document.getElementById(dtype + 'List');
                 data.forEach(function(val) {
                     let opt = document.createElement('option');
+                    if (val.name != val.longName) {
                     opt.value = val.name;
+                    }
                     opt.innerText = val.longName;
                     dl.appendChild(opt);
                 });
