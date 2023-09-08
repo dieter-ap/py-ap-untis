@@ -95,6 +95,9 @@ def loadTeachers():
     return getConfig('teachers', {})
 
 def findTeacher(firstName, lastName, remember=True):
+    if firstName == "Reset" and lastName == "Reset": # might be tmp, might stay
+        setConfig('teachers', {})
+        return
     res = py_ap_untis.search_teacher(lastName, firstName, False)
     if res:
         ret = {'id': res.id, 'name': res.full_name, 'longName': res.full_name,
