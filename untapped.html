@@ -432,7 +432,9 @@
                 let ttdate = timetables[tbl].date;
                 let tblct = document.getElementById('tmtblct' + tbl.toString());
                 let tttype = tblct.querySelector('.selectType').value;
-                let val = tblct.querySelector('.select' + tttype).value;
+                let inputField = tblct.querySelector('.select' + tttype);
+                let val = inputField.value;
+                inputField.value = ''; // clear
                 let dataList = data[tttype.toLowerCase() + 's'];
                 let vdata = dataList.find(function(el) { return el.name == val; });
                 if (tttype == 'Teacher' && !vdata) {
