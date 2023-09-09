@@ -27,6 +27,9 @@
                 border-radius: 5px;
                 padding: 2px;
             }
+            span.symbolGroup.active {
+                background-color: lightgray;
+            }
             input, select {
                 margin: 5px 10px 0px 0px;
             }
@@ -373,6 +376,7 @@
                 } else {
                     lesson_ct = document.createElement('span');
                     lesson_ct.dataset.lessonid = val.id;
+                    lesson_ct.onclick = _mkToggleLessonActive(lesson_ct);
                     cell.appendChild(lesson_ct);
                 }
                 let content = document.createElement('span');
@@ -396,6 +400,21 @@
                 content.title = title.join(', ');
                 lesson_ct.appendChild(content);
             }
+
+            function _mkToggleLessonActive(el) {
+                return function() {
+                    let action;
+                    if (el.classList.contains('active')) {
+                        action = 'remove';
+                    } else {
+                        action = 'add';
+                    }
+                    el.classList[action]('active');
+                    if (el.children.length == 1) {
+                        el.classList[action]('symbolGroup');
+                    }
+                };
+            } 
 
             let x; // for debug
             // callback function for the Load Timetable button
