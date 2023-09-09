@@ -233,6 +233,7 @@
                 let dt = document.getElementById('ttdate').value;
                 timetables[ttidx] = {
                     'date': dt,
+                    'queryData': [],
                     'symbols': [
                         '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫',
                         '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛',
@@ -423,15 +424,15 @@
                 };
             } 
 
-            let x; // for debug
             // callback function for the Load Timetable button
             function loadTimetable(tbl, queryRes, symbol) {
-                x = queryRes; // for debug
                 qInfo = {
                     'tbltype': queryRes.tbltype,
                     'objid': queryRes.objid,
-                    'symbol': symbol
+                    'symbol': symbol,
+                    'result': queryRes.table
                 };
+                timetables[tbl].queryData.push(qInfo);
                 queryRes.table.forEach(function(val, idx, arr) { addTtEl(tbl, qInfo, val); });
             }
 
