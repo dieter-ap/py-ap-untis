@@ -50,7 +50,7 @@
             </div>
             <div>
                 <label for="password">Password:</label>
-                <input type="password" id="untispass" name="password">
+                <input type="password" id="untispass" name="password" onkeypress="loginOnEnter(event)">
             </div>
             <div>
                 <button onclick="untislogin()">Webuntis login</button>
@@ -93,6 +93,12 @@
                 } else {
                     settings.hidden = true;
                     btn.textContent = '▼';
+                }
+            }
+
+            function loginOnEnter(ev) {
+                if (ev.key == 'Enter') {
+                    untislogin();
                 }
             }
 
