@@ -80,6 +80,9 @@
                     document.getElementById('untisuser').value = val;
                 })
                 pywebview.api.loadTeachers().then(function(res) {
+                    if (!Object.keys(res).length) {
+                        res = []; // Replace {} returned when not yet in config.
+                    }
                     loadData('teacher', res);
                 })
             })
