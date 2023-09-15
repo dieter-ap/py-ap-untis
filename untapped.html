@@ -70,8 +70,8 @@
         
         <div id="timetables"></div>
         <div id="addContainer" hidden="true">
-            <input id="ttdate" type="date">
-            <button onclick="addTimetable()">New Timetable</button>
+            <input id="ttdate" type="date" onchange="enabledTtBtn(event)">
+            <button onclick="addTimetable()" disabled="true">New Timetable</button>
         </div>
 
         <script>
@@ -138,6 +138,10 @@
                         document.getElementById('ttloadbtn').disabled = true;
                     }
                 );
+            }
+
+            function enabledTtBtn(ev) {
+                ev.target.parentElement.querySelector('button').disabled = false;
             }
 
             let data = {};
