@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 from pathlib import Path
+import sys
 
 try:
     import webview
@@ -178,4 +179,5 @@ ui = webview.create_window('Untapped', url='./untapped.html')
 ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
           getDateFormats, getSubjects, getGroups, loadTeachers, findTeacher,
           getTimeTable)
-webview.start(debug=True)
+
+webview.start(debug = bool(sys.argv[1:]) and 'debug' in sys.argv[1].lower())
