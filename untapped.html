@@ -295,7 +295,7 @@
 
                 let typesel = document.createElement('select');
                 typesel.className = 'selectType';
-                ['Subject', 'Group', 'Teacher'].forEach(function(label) {
+                ['Group', 'Subject', 'Teacher'].forEach(function(label) {
                     let opt = document.createElement('option');
                     opt.innerText = label;
                     typesel.appendChild(opt);
@@ -308,15 +308,15 @@
                 tchsel.setAttribute('list', 'teacherList');
                 ttd.append(tchsel);
 
-                let subsel = document.createElement('input');
-                subsel.className = 'selectSubject';
-                subsel.setAttribute('list', 'subjectList');
-                ttd.append(subsel);
-
                 let grpsel = document.createElement('input');
                 grpsel.className = 'selectGroup';
                 grpsel.setAttribute('list', 'groupList');
                 ttd.append(grpsel);
+
+                let subsel = document.createElement('input');
+                subsel.className = 'selectSubject';
+                subsel.setAttribute('list', 'subjectList');
+                ttd.append(subsel);
 
                 let symsel = document.createElement('select');
                 symsel.className = 'selectSymbol';
