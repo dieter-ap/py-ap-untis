@@ -43,6 +43,7 @@
         <datalist id="subjectList"></datalist>
         <datalist id="groupList"></datalist>
         <datalist id="teacherList"></datalist>
+        <datalist id="roomList"></datalist>
         <div id="loginshizzle">
             <div>
                 <label for="username">Username:</label>
@@ -117,6 +118,7 @@
                             document.getElementById('toggleSettings').disabled = false;
                             document.getElementById('toggleSettings').hidden = false;
                             pywebview.api.getSubjects().then(function(res) { loadData('subject', res); });
+                            pywebview.api.getRooms().then(function(res) { loadData('room', res); });
                             //pywebview.api.getGroups().then(loadGroups); automatically when schoolyears are loaded
                             document.getElementById('addContainer').hidden = false;
                         } else {
@@ -295,7 +297,7 @@
 
                 let typesel = document.createElement('select');
                 typesel.className = 'selectType';
-                ['Group', 'Subject', 'Teacher'].forEach(function(label) {
+                ['Group', 'Room', 'Subject', 'Teacher'].forEach(function(label) {
                     let opt = document.createElement('option');
                     opt.innerText = label;
                     typesel.appendChild(opt);
@@ -312,6 +314,11 @@
                 grpsel.className = 'selectGroup';
                 grpsel.setAttribute('list', 'groupList');
                 ttd.append(grpsel);
+
+                let roomsel = document.createElement('input');
+                roomsel.className = 'selectRoom';
+                roomsel.setAttribute('list', 'roomList');
+                ttd.append(roomsel);
 
                 let subsel = document.createElement('input');
                 subsel.className = 'selectSubject';

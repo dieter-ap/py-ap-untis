@@ -136,6 +136,12 @@ def getGroups(schoolyear):
         {'id': s.id, 'name': s.name, 'longName': s.long_name} for s in groups
     ]
 
+def getRooms():
+    rooms = list(py_ap_untis.get_rooms().values())
+    return [
+        {'id': r.id, 'name': r.name, 'longName': r.long_name} for r in rooms
+    ]
+
 def getTeacherData(id_data):
     '''
     Return dictionary with teacher information from an id (because no right to
@@ -177,7 +183,7 @@ def getTimeTable(tbltype, id, tbldate):
 
 ui = webview.create_window('Untapped', url='./untapped.html')
 ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
-          getDateFormats, getSubjects, getGroups, loadTeachers, findTeacher,
-          getTimeTable)
+          getDateFormats, getSubjects, getGroups, getRooms, loadTeachers,
+          findTeacher, getTimeTable)
 
 webview.start(debug = bool(sys.argv[1:]) and 'debug' in sys.argv[1].lower())
