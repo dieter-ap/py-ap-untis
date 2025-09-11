@@ -71,6 +71,13 @@ def untisLogout():
 
 def _data4schoolyear(schoolyear):
     return {
+        'id': 0,
+        'start': '2025-09-15',
+        'end': '2026-09-18',
+        'current': True,
+        'name': '2025-2026'
+    }
+    return {
         'id': schoolyear.id,
         'start': schoolyear.start.date().isoformat(),
         'end': schoolyear.end.date().isoformat(),
