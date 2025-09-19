@@ -11,6 +11,9 @@
                 border-radius: 15px;
                 padding: 10px;
             }
+            .tablelabel {
+                margin: 0px 0px 5px 0px;
+            }
             table.timetable {
                 border: solid 1px black;
                 border-spacing: 0;
@@ -253,6 +256,14 @@
                 let ttd = document.createElement('div');
                 ttd.id = 'tmtblct' + ttidx.toString();
                 el_tables.appendChild(ttd);
+
+                let lbltext = document.createElement('span');
+                lbltext.innerText = 'Label: ';
+                ttd.append(lbltext);
+                let labelfld = document.createElement('input');
+                labelfld.className = 'tablelabel';
+                labelfld.title = 'Label for this table';
+                ttd.append(labelfld);
 
                 let tt = document.createElement('table');
                 tt.id = 'tmtbl' + ttidx.toString();
