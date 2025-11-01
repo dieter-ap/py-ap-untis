@@ -7,7 +7,10 @@ import sys
 try:
     import webview
 except ImportError:
-    exit('install the pywebview package')
+    if __name__ == '__main__':
+        exit('install the pywebview package')
+    else:
+        print('pywebview not found, needed for UI')
 
 import py_ap_untis
 
@@ -180,10 +183,10 @@ def getTimeTable(tbltype, id, tbldate):
         'tbltype': tbltype
     }
 
-
-ui = webview.create_window('Untapped', url='./untapped.html')
-ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
-          getDateFormats, getSubjects, getGroups, getRooms, loadTeachers,
-          findTeacher, getTimeTable)
+if __name__ == '__main__':
+    ui = webview.create_window('Untapped', url='./untapped.html')
+    ui.expose(getConfig, untisLogin, untisLogout, loadSchoolyears,
+            getDateFormats, getSubjects, getGroups, getRooms, loadTeachers,
+            findTeacher, getTimeTable)
 
 webview.start(debug = bool(sys.argv[1:]) and 'debug' in sys.argv[1].lower())
