@@ -25,6 +25,26 @@
             .timetable td, .timetable th {
                 border: solid 1px;
             }
+            span.lesson {
+                position: relative;
+            }
+            span.lesson .tooltip {
+                visibility: hidden;
+                position: absolute;
+                bottom: 125%; /* above the lesson */
+                left: 50%;
+                margin-left: -60%;
+                z-index: 1;
+                width: max-content;
+                padding: 5px;
+                border: solid 1px black;
+                border-radius: 5px;
+                background-color: ghostwhite;
+                font-size: small;
+            }
+            span.lesson:hover .tooltip {
+                visibility: visible;
+            }
             span.symbolGroup {
                 border: solid 1px darkgray;
                 border-radius: 5px;
@@ -417,24 +437,33 @@
                     cell.appendChild(lesson_ct);
                 }
                 let content = document.createElement('span');
+                content.classList.add('lesson');
                 //let el_class = ttable.tbltype + '_' + ttable.objid;
                 //content.className = el_class;
                 content.innerText = ttable.symbol;
-                let title = [];
+                let tooltip = [];
                 if (val.teachers.length) {
-                    //let tid = val.teachers[0].id;
-                    title.push('T: ' + (val.teachers[0].displayName || val.teachers[0].name));
+                    let data = val.teachers.map(function(x) { return x.displayName || x.name; });
+                    tooltip.push('T: ' + data.join(', '));
                 }
                 if (val.subjects.length) {
-                    title.push('S: ' + val.subjects[0].long_name);
+                    let data = val.subjects.map(function(x) { return x.long_name; })
+                    tooltip.push('S: ' + data.join(', '));
                 }
                 if (val.groups.length) {
-                    title.push('G: ' + val.groups[0].name); // XXX need to use all groups
+                    let data = val.groups.map(function(x) { return x.name; })
+                    tooltip.push('G: ' + data.join(', '));
                 }
                 if (val.rooms.length) {
-                    title.push('R: ' + val.rooms[0].name);
+                    let data = val.rooms.map(function(x) { return x.name; })
+                    tooltip.push('R: ' + data.join(', '));
                 }
-                content.title = title.join(', ');
+                //content.title = title.join('\n');
+                let ct_tt = document.createElement('span'); // tooltip
+                ct_tt.innerHTML = tooltip.join('<br>')
+                ct_tt.classList.add('tooltip');
+
+                content.appendChild(ct_tt);
                 lesson_ct.appendChild(content);
             }
 
