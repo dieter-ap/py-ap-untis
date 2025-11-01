@@ -151,7 +151,12 @@ def getTeacherData(id_data):
     query). id_data is a list of dicts containing an 'id' key. If we have no
     data about this teacher, use the id as 'name'.
     '''
-    teacherMap = {el['id']: el for el in getConfig('teachers', [])}
+    if os.path.isfile('teachers.json'):
+        with open('teachers.json') as tfh:
+            data = json.load(tfh)
+        teacherMap = {t['teacher']['id']: t['teacher'] for t in data['teachers']}
+    else:
+        teacherMap = {el['id']: el for el in getConfig('teachers', [])}
     return [teacherMap.get(ti['id'], dict(ti, name=ti['id'])) for ti in id_data]
 
 def getTimeTable(tbltype, id, tbldate):

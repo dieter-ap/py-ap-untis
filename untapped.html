@@ -422,8 +422,8 @@
                 content.innerText = ttable.symbol;
                 let title = [];
                 if (val.teachers.length) {
-                    let tid = val.teachers[0].id;
-                    title.push('T: ' + val.teachers[0].name);
+                    //let tid = val.teachers[0].id;
+                    title.push('T: ' + (val.teachers[0].displayName || val.teachers[0].name));
                 }
                 if (val.subjects.length) {
                     title.push('S: ' + val.subjects[0].long_name);
