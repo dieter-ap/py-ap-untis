@@ -153,8 +153,8 @@ def getTeacherData(id_data):
 
 def getTimeTable(tbltype, id, tbldate):
     '''
-    Return the timetable for the given teacher (numeric id) and the tbldate
-    which needs to be in isoformat.
+    Return the timetable for the given object (teacher, group, …) (numeric id)
+    and the tbldate which needs to be in isoformat.
     '''
     global untis_session
     if tbltype == 'group':

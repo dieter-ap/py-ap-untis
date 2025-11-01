@@ -150,6 +150,9 @@
             }
 
             let data = {};
+            /* function to get values for the dropdowns from the backend
+               (subjects, rooms, teachers, groups)
+            */
             function loadData(dtype, newData) {
                 data[dtype + 's'] = newData;
                 let dl = document.getElementById(dtype + 'List');
@@ -270,6 +273,7 @@
                 tt.className = 'timetable';
                 ttd.appendChild(tt);
 
+                // Table headers with dates
                 let tr = document.createElement('tr');
                 tt.appendChild(tr);
                 pywebview.api.getDateFormats(dt, '%b', '%a %d').then(function(res) {
@@ -404,8 +408,8 @@
                 let cell_id = 'tt_' + tbl.toString() + '_d' + val.day.toString() + '_tm' + val.time.toString();
                 let cell = document.getElementById(cell_id);
                 let lesson_ct = cell.querySelector('span[data-lessonid="' + val.id.toString() + '"]');
-                if (lesson_ct) {
-                    lesson_ct.classList.add('symbolGroup');
+                if (lesson_ct) { // already added for an earlier query
+                    lesson_ct.classList.add('symbolGroup'); // Add a border to this lesson
                 } else {
                     lesson_ct = document.createElement('span');
                     lesson_ct.dataset.lessonid = val.id;
